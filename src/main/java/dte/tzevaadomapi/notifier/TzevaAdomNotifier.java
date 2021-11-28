@@ -63,12 +63,12 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 			//request the most recent alert again
 			requestMostRecentAlert(this.requestFailureHandler)
 			.filter(currentAlert -> !mostRecentAlert.contentEquals(currentAlert)) //if the 2 alerts don't equal - TZEVA ADOM
-			.ifPresent(currentAlert -> 
+			.ifPresent(tzevaAdomAlert -> 
 			{
-				mostRecentAlert.set(currentAlert);
+				mostRecentAlert.set(tzevaAdomAlert);
 
-				this.tzevaAdomListeners.forEach(listener -> listener.accept(currentAlert));
-				this.history.add(currentAlert);
+				this.tzevaAdomListeners.forEach(listener -> listener.accept(tzevaAdomAlert));
+				this.history.add(tzevaAdomAlert);
 			});
 		}
 	}
