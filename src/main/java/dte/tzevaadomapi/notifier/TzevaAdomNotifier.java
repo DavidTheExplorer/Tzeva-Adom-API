@@ -10,11 +10,11 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 
 import dte.tzevaadomapi.alert.Alert;
 import dte.tzevaadomapi.alert.source.AlertSource;
+import dte.tzevaadomapi.utils.Wrapper;
 
 /**
  * Notifies registered listeners once a Tzeva Adom takes place.
@@ -47,8 +47,8 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 	public void listen() throws InterruptedException
 	{
 		//start with the most recent alert
-		AtomicReference<Alert> mostRecentAlert = requestMostRecentAlert(this.initialRequestFailureHandler)
-				.map(AtomicReference::new)
+		Wrapper<Alert> mostRecentAlert = requestMostRecentAlert(this.initialRequestFailureHandler)
+				.map(Wrapper::new)
 				.orElse(null);
 
 		if(mostRecentAlert == null)
