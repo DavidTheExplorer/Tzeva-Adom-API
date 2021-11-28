@@ -27,4 +27,9 @@ public class Wrapper<T>
 		T newObject = merger.apply(this.object);
 		set(newObject);
 	}
+	
+	public boolean contentEquals(Object anotherObject) 
+	{
+		return this.object.equals(anotherObject);
+	}
 }
