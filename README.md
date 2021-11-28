@@ -1,15 +1,15 @@
 # Tzeva Adom API
-Java API that listens to Pikud Ha Oref's API and notifies your program once a Tzeva Adom takes place.\
+Java API that listens to Pikud Ha Oref's API and notifies your program once a Tzeva Adom takes place.
 
-It works by requesting the most recent alert from Pikud Ha Oref's API every constant amount of time, and then comparing it against the previous sent one(time & city).\
-If the 2 don't equal - your program is immediately notified.
+Every constant time a request for the most recent alert is sent to Pikud Ha Oref, and then it gets compared to the the previous one.\
+If the 2 don't equal - all your register listeners are notified.
 
 ## Requirements
 Java 8. We suffered enough from dinosaurs.
 
 ## How to use?
 All you need is an instance of `TzevaAdomNotifier` which is fluently created.\
-Let's create one that checks Pikud Ha Oref's API every 3 seconds, and sends a message to the console if it's Tzeva Adom:
+Let's create one that requests an alert every 3 seconds, and sends a message to the console if it was Tzeva Adom:
 ```java
 TzevaAdomNotifier tzevaAdomNotifier = new TzevaAdomNotifier.Builder()
         .every(Duration.ofSeconds(3))
