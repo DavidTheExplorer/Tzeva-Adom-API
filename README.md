@@ -1,11 +1,29 @@
 # Tzeva Adom API
-Java API that listens to Pikud Ha Oref's API and notifies your program once a Tzeva Adom takes place.
+Simple Java API that listens to `Pikud Haoref`'s API and notifies your program once a Tzeva Adom takes place.
 
 Every constant time a request for the most recent alert is sent to Pikud Ha Oref, and then it gets compared to the the previous one.\
 If the 2 don't equal - all your register listeners are notified.
 
 ## Requirements
-Java 8. We suffered enough from dinosaurs.
+Java 8 and Maven. We suffered enough from dinosaurs.
+
+Maven:
+```xml
+<repository>
+        <id>jitpack.io</id>
+        <url>https://jitpack.io</url>
+</repository>
+```
+
+```xml
+<dependency>
+        <groupId>com.github.DavidTheExplorer</groupId>
+        <artifactId>Tzeva-Adom-API</artifactId>
+        <version>master-SNAPSHOT</version>
+</dependency>
+```
+
+
 
 ## How to use?
 All you need is an instance of `TzevaAdomNotifier` which is fluently created.\
@@ -28,3 +46,4 @@ TzevaAdomNotifier tzevaAdomNotifier = new TzevaAdomNotifier.Builder()
 ## Customization
 If you want to request alerts from anywhere else, you need to implement `AlertSource` and use it instead of `PHOAlertSource`.\
 If your source is an API, you should extend the provided `JSONAlertSource` class instead :)
+
