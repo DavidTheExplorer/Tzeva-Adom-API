@@ -1,9 +1,5 @@
 # Tzeva Adom API
-Simple Java API that listens to `Pikud Haoref`'s API and notifies your program once a Tzeva Adom takes place.
-
-Every constant time a request for the most recent alert is sent to Pikud Ha Oref, and then it gets compared to the the previous one.\
-If the 2 don't equal - all your register listeners are notified.
-
+Simple Java API that listens to `Pikud Haoref`'s API and allows you to register a listener that gets called once a Tzeva Adom takes place.
 ## Requirements
 Java 8 and Maven. We suffered enough from dinosaurs.
 
