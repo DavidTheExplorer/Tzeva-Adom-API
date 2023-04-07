@@ -53,7 +53,7 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 			TimeUnit.MILLISECONDS.sleep(this.requestDelay.toMillis());
 
 			//request the most recent alert again
-			requestMostRecentAlert()
+			getMostRecentAlert()
 			.filter(this::isTzevaAdom)
 			.ifPresent(tzevaAdomAlert -> 
 			{
@@ -105,7 +105,7 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 		{
 			try 
 			{
-				return this.alertSource.requestMostRecentAlert();
+				return this.alertSource.getMostRecentAlert();
 			}
 			catch(Exception ignored) //we don't care about exceptions, we want to request forever until we get an alert
 			{
@@ -114,11 +114,11 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 		}
 	}
 
-	private Optional<Alert> requestMostRecentAlert() 
+	private Optional<Alert> getMostRecentAlert() 
 	{
 		try 
 		{
-			return Optional.of(this.alertSource.requestMostRecentAlert());
+			return Optional.of(this.alertSource.getMostRecentAlert());
 		}
 		catch(Exception exception) 
 		{

@@ -26,7 +26,7 @@ public abstract class JSONAlertSource implements AlertSource
 	}
 	
 	@Override
-	public Alert requestMostRecentAlert() throws Exception
+	public Alert getMostRecentAlert() throws Exception
 	{
 		JSONArray alertsJSON = requestAlertsJSON();
 		
