@@ -1,4 +1,4 @@
-package dte.tzevaadomapi.alert.source;
+package dte.tzevaadomapi.alertsource;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -7,7 +7,7 @@ import java.util.Locale;
 import org.json.simple.JSONObject;
 
 import dte.tzevaadomapi.alert.Alert;
-import dte.tzevaadomapi.alert.source.json.JSONAlertSource;
+import dte.tzevaadomapi.alertsource.json.JSONAlertSource;
 
 /**
  * Requests Alerts from the the website of Pikud Ha Oref.

@@ -1,4 +1,4 @@
-package dte.tzevaadomapi.alert.source.json;
+package dte.tzevaadomapi.alertsource.json;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import dte.tzevaadomapi.alert.Alert;
-import dte.tzevaadomapi.alert.source.AlertSource;
+import dte.tzevaadomapi.alertsource.AlertSource;
 
 /**
  * Requests Alerts from an API that returns a JSON response of a list of Alerts.
@@ -53,4 +53,12 @@ public abstract class JSONAlertSource implements AlertSource
 		}
 		return (JSONArray) JSONValue.parse(alertsJSONText);
 	}
+	
+	
+	
+	public class EmptyAlertJSONException extends RuntimeException
+	{
+		private static final long serialVersionUID = 290350673645594252L;
+	}
+
 }

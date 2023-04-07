@@ -1,4 +1,4 @@
-package dte.tzevaadomapi.alert.source;
+package dte.tzevaadomapi.alertsource;
 
 import dte.tzevaadomapi.alert.Alert;
 

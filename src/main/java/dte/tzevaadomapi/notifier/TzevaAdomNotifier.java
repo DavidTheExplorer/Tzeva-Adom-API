@@ -13,7 +13,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import dte.tzevaadomapi.alert.Alert;
-import dte.tzevaadomapi.alert.source.AlertSource;
+import dte.tzevaadomapi.alertsource.AlertSource;
 
 /**
  * Notifies registered listeners once a Tzeva Adom takes place.
