@@ -154,7 +154,7 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 			return this;
 		}
 		
-		public Builder ifTzevaAdom(Consumer<Alert> listener)
+		public Builder onTzevaAdom(Consumer<Alert> listener)
 		{
 			this.listeners.add(listener);
 			return this;
