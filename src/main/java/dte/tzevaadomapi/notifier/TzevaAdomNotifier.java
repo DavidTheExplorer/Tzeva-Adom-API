@@ -25,15 +25,13 @@ import dte.tzevaadomapi.alertsource.AlertSource;
  */
 public class TzevaAdomNotifier implements Iterable<Alert>
 {
-	//requests
 	private final AlertSource alertSource;
 	private final Duration requestDelay;
 	private final Consumer<Exception> requestFailureHandler;
-	private LocalDateTime initialRequestTime;
-
-	//general
 	private final Set<Consumer<Alert>> listeners = new HashSet<>();
 	private final Deque<Alert> history = new LinkedList<>();
+
+	private LocalDateTime initialRequestTime;
 
 	private TzevaAdomNotifier(AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler) 
 	{
@@ -133,8 +131,8 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 	{
 		private AlertSource alertSource;
 		private Duration requestDelay;
-		private Set<Consumer<Alert>> listeners = new HashSet<>();
 		private Consumer<Exception> requestFailureHandler;
+		private Set<Consumer<Alert>> listeners = new HashSet<>();
 
 		public Builder requestFrom(AlertSource alertSource) 
 		{
