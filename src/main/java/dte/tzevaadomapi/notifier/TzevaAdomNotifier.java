@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Optional;
@@ -73,7 +74,7 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 
 	public Set<Alert> getHistory()
 	{
-		return new HashSet<>(this.history);
+		return new LinkedHashSet<>(this.history);
 	}
 
 	public LocalDateTime getInitialRequestTime() 
