@@ -16,9 +16,9 @@ public class PHOAlertSource extends JSONAlertSource
 {
 	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
 	
-	public PHOAlertSource(String phoRequestURL)
+	public PHOAlertSource()
 	{
-		super(phoRequestURL);
+		super("https://www.oref.org.il/WarningMessages/History/AlertsHistory.json");
 	}
 	
 	@Override
