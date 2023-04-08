@@ -1,4 +1,4 @@
-package dte.tzevaadomapi.alert.source.json;
+package dte.tzevaadomapi.alertsource.json;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -11,7 +11,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
 import dte.tzevaadomapi.alert.Alert;
-import dte.tzevaadomapi.alert.source.AlertSource;
+import dte.tzevaadomapi.alertsource.AlertSource;
 
 /**
  * Requests Alerts from an API that returns a JSON response of a list of Alerts.
@@ -26,12 +26,12 @@ public abstract class JSONAlertSource implements AlertSource
 	}
 	
 	@Override
-	public Alert requestMostRecentAlert() throws Exception
+	public Alert getMostRecentAlert() throws Exception
 	{
 		JSONArray alertsJSON = requestAlertsJSON();
 		
-		if(alertsJSON.isEmpty())
-			throw new EmptyAlertJSONException();
+		if(alertsJSON == null || alertsJSON.isEmpty())
+			throw new IllegalArgumentException("Cannot get the most recent alert due to an empty JSON response!");
 		
 		JSONObject mostRecentAlertJSON = (JSONObject) alertsJSON.get(alertsJSON.size()-1);
 		

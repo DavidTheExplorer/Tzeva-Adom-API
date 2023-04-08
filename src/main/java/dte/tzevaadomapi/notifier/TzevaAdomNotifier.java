@@ -5,16 +5,15 @@ import java.time.LocalDateTime;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import dte.tzevaadomapi.alert.Alert;
-import dte.tzevaadomapi.alert.source.AlertSource;
-import dte.tzevaadomapi.utils.Wrapper;
+import dte.tzevaadomapi.alertsource.AlertSource;
 
 /**
  * Notifies registered listeners once a Tzeva Adom takes place.
@@ -26,56 +25,45 @@ import dte.tzevaadomapi.utils.Wrapper;
  */
 public class TzevaAdomNotifier implements Iterable<Alert>
 {
-	//requests
 	private final AlertSource alertSource;
 	private final Duration requestDelay;
-	private final Consumer<Exception> requestFailureHandler, initialRequestFailureHandler;
-	private LocalDateTime initialRequestTime;
-
-	//general
-	private final Set<Consumer<Alert>> tzevaAdomListeners = new HashSet<>();
+	private final Consumer<Exception> requestFailureHandler;
+	private final Set<Consumer<Alert>> listeners = new HashSet<>();
 	private final Deque<Alert> history = new LinkedList<>();
 
-	private TzevaAdomNotifier(AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler, Consumer<Exception> initialRequestFailureHandler) 
+	private LocalDateTime initialRequestTime;
+
+	private TzevaAdomNotifier(AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler) 
 	{
 		this.alertSource = alertSource;
 		this.requestDelay = requestDelay;
 		this.requestFailureHandler = requestFailureHandler;
-		this.initialRequestFailureHandler = initialRequestFailureHandler;
 	}
 
 	public void listen() throws InterruptedException
 	{
-		//start with the most recent alert
-		Wrapper<Alert> mostRecentAlert = requestMostRecentAlert(this.initialRequestFailureHandler)
-				.map(Wrapper::new)
-				.orElse(null);
-
-		if(mostRecentAlert == null)
-			return;
-
+		//start with an initial alert - against which future alerts will be compared
+		this.history.add(getMostRecentAlert());
 		this.initialRequestTime = LocalDateTime.now();
 
 		while(true)
 		{
 			TimeUnit.MILLISECONDS.sleep(this.requestDelay.toMillis());
 
-			//request the most recent alert again
-			requestMostRecentAlert(this.requestFailureHandler)
-			.filter(currentAlert -> !mostRecentAlert.contentEquals(currentAlert)) //if the 2 alerts don't equal - TZEVA ADOM
-			.ifPresent(tzevaAdomAlert -> 
-			{
-				mostRecentAlert.set(tzevaAdomAlert);
-
-				this.tzevaAdomListeners.forEach(listener -> listener.accept(tzevaAdomAlert));
-				this.history.add(tzevaAdomAlert);
-			});
+			Alert alert = getMostRecentAlert();
+			
+			//if the last alert in history doesn't equal to the last requested one - It's TZEVA ADOM
+			if(this.history.peekLast().equals(alert))
+				continue;
+			
+			this.listeners.forEach(listener -> listener.accept(alert));
+			this.history.add(alert);
 		}
 	}
 
 	public void addListener(Consumer<Alert> tzevaAdomListener) 
 	{
-		this.tzevaAdomListeners.add(tzevaAdomListener);
+		this.listeners.add(tzevaAdomListener);
 	}
 
 	public Alert getLastAlert()
@@ -85,7 +73,7 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 
 	public Set<Alert> getHistory()
 	{
-		return new HashSet<>(this.history);
+		return new LinkedHashSet<>(this.history);
 	}
 
 	public LocalDateTime getInitialRequestTime() 
@@ -104,16 +92,18 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 		return this.history.iterator();
 	}
 
-	private Optional<Alert> requestMostRecentAlert(Consumer<Exception> failureListener) 
+	private Alert getMostRecentAlert()
 	{
-		try 
+		while(true) 
 		{
-			return Optional.of(this.alertSource.requestMostRecentAlert());
-		}
-		catch(Exception exception) 
-		{
-			failureListener.accept(exception);
-			return Optional.empty();
+			try 
+			{
+				return this.alertSource.getMostRecentAlert();
+			}
+			catch(Exception exception)
+			{
+				this.requestFailureHandler.accept(exception);
+			}
 		}
 	}
 
@@ -123,9 +113,9 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 	{
 		private AlertSource alertSource;
 		private Duration requestDelay;
-		private Set<Consumer<Alert>> tzevaAdomListeners = new HashSet<>();
-		private Consumer<Exception> pullFailureHandler, initialPullFailureHandler;
-		
+		private Consumer<Exception> requestFailureHandler;
+		private Set<Consumer<Alert>> listeners = new HashSet<>();
+
 		public Builder requestFrom(AlertSource alertSource) 
 		{
 			this.alertSource = alertSource;
@@ -138,35 +128,26 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 			return this;
 		}
 		
-		public Builder onFailedInitialRequest(Consumer<Exception> handler) 
-		{
-			this.initialPullFailureHandler = handler;
-			return this;
-		}
-
 		public Builder onFailedRequest(Consumer<Exception> handler) 
 		{
-			this.pullFailureHandler = handler;
+			this.requestFailureHandler = handler;
 			return this;
 		}
 		
-		public Builder ifTzevaAdom(Consumer<Alert> listener)
+		public Builder onTzevaAdom(Consumer<Alert> listener)
 		{
-			this.tzevaAdomListeners.add(listener);
+			this.listeners.add(listener);
 			return this;
 		}
 		
 		public TzevaAdomNotifier build()
 		{
 			Objects.requireNonNull(this.alertSource, "The source of the alerts must be provided!");
-			Objects.requireNonNull(this.requestDelay, "The delay between pulling alerts must be provided!");
-			Objects.requireNonNull(this.pullFailureHandler, "The alerts' pull failure handler must be provided!");
+			Objects.requireNonNull(this.requestDelay, "The delay between requesting alerts must be provided!");
+			Objects.requireNonNull(this.requestFailureHandler, "The alerts' request failure handler must be provided!");
 			
-			if(this.initialPullFailureHandler == null)
-				this.initialPullFailureHandler = this.pullFailureHandler;
-			
-			TzevaAdomNotifier notifier = new TzevaAdomNotifier(this.alertSource, this.requestDelay, this.pullFailureHandler, this.initialPullFailureHandler);
-			this.tzevaAdomListeners.forEach(notifier::addListener);
+			TzevaAdomNotifier notifier = new TzevaAdomNotifier(this.alertSource, this.requestDelay, this.requestFailureHandler);
+			this.listeners.forEach(notifier::addListener);
 
 			return notifier;
 		}

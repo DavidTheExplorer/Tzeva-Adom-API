@@ -1,9 +1,9 @@
-package dte.tzevaadomapi.alert.source;
+package dte.tzevaadomapi.alertsource;
 
 import dte.tzevaadomapi.alert.Alert;
 
 @FunctionalInterface
 public interface AlertSource
 {
-	Alert requestMostRecentAlert() throws Exception;
+	Alert getMostRecentAlert() throws Exception;
 }
