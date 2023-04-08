@@ -30,8 +30,8 @@ public abstract class JSONAlertSource implements AlertSource
 	{
 		JSONArray alertsJSON = requestAlertsJSON();
 		
-		if(alertsJSON.isEmpty())
-			throw new EmptyAlertJSONException();
+		if(alertsJSON == null || alertsJSON.isEmpty())
+			throw new IllegalArgumentException("Cannot get the most recent alert due to an empty JSON response!");
 		
 		JSONObject mostRecentAlertJSON = (JSONObject) alertsJSON.get(alertsJSON.size()-1);
 		
@@ -53,12 +53,4 @@ public abstract class JSONAlertSource implements AlertSource
 		}
 		return (JSONArray) JSONValue.parse(alertsJSONText);
 	}
-	
-	
-	
-	public class EmptyAlertJSONException extends RuntimeException
-	{
-		private static final long serialVersionUID = 290350673645594252L;
-	}
-
 }
