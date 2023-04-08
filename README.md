@@ -1,9 +1,8 @@
 # Tzeva Adom API
-Simple Java API that listens to `Pikud Haoref`'s API and allows you to register a listener that gets called once a Tzeva Adom takes place.
-## Requirements
-Java 8 and Maven. We suffered enough from dinosaurs.
+Simple Java API that listens to `Pikud Haoref's API` and notifies registered listeners once a Tzeva Adom takes place.
 
-Maven:
+## How to import
+Maven(Jitpack) Repository:
 ```xml
 <repository>
         <id>jitpack.io</id>
@@ -21,25 +20,18 @@ Maven:
 
 
 
-## How to use?
-All you need is an instance of `TzevaAdomNotifier` which is fluently created.\
-Let's create one that requests an alert every 3 seconds, and sends a message to the console if it was Tzeva Adom:
+## How to use
+All you need is a `TzevaAdomNotifier` object, let's create one that sends a message to the console when it's Tzeva Adom:
 ```java
-TzevaAdomNotifier tzevaAdomNotifier = new TzevaAdomNotifier.Builder()
-        .every(Duration.ofSeconds(3))
-        .requestFrom(new PHOAlertSource("https://www.oref.org.il/WarningMessages/History/AlertsHistory.json"))
+TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
+        .every(Duration.ofSeconds(3)) //amount of delay between requests
+        .requestFrom(new PHOAlertSource())
         .onFailedRequest(exception -> System.err.println("Failed to send a request to Pikud Ha'oref..."))
-        .ifTzevaAdom(alert ->
-        {
-          System.out.println("-~- Tzeva ADOM -~-");
-          System.out.println("At: " + alert.getCity());
-          System.out.println("Time: " + alert.getDate().toLocalTime());
-          System.out.println(); 
-        })
+        .onTzevaAdom(alert -> System.out.println("Tzeva Adom at: " + alert.getCity()))
         .build();
+        
+notifier.listen(); //throws InterruptedException due to the sleeping between requests
 ```
 
 ## Customization
-If you want to request alerts from anywhere else, you need to implement `AlertSource` and use it instead of `PHOAlertSource`.\
-If your source is an API, you should extend the provided `JSONAlertSource` class instead :)
-
+If your alerts come from anywhere else, you need to either implement `AlertSource` or inherit `JSONAlertSource` for JSON APIs.
