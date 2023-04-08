@@ -8,7 +8,6 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -43,22 +42,22 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 
 	public void listen() throws InterruptedException
 	{
-		this.history.add(repeatedGetMostRecentAlert());
-		
+		//start with an initial alert - against which future alerts will be compared
+		this.history.add(getMostRecentAlert());
 		this.initialRequestTime = LocalDateTime.now();
 
 		while(true)
 		{
 			TimeUnit.MILLISECONDS.sleep(this.requestDelay.toMillis());
 
-			//request the most recent alert again
-			getMostRecentAlert()
-			.filter(this::isTzevaAdom)
-			.ifPresent(tzevaAdomAlert -> 
-			{
-				this.listeners.forEach(listener -> listener.accept(tzevaAdomAlert));
-				this.history.add(tzevaAdomAlert);
-			});
+			Alert alert = getMostRecentAlert();
+			
+			//if the last alert in history doesn't equal to the last requested one - It's TZEVA ADOM
+			if(this.history.peekLast().equals(alert))
+				continue;
+			
+			this.listeners.forEach(listener -> listener.accept(alert));
+			this.history.add(alert);
 		}
 	}
 
@@ -93,12 +92,7 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 		return this.history.iterator();
 	}
 
-	private boolean isTzevaAdom(Alert alert) 
-	{
-		return !this.history.peekLast().equals(alert);
-	}
-
-	private Alert repeatedGetMostRecentAlert() throws InterruptedException
+	private Alert getMostRecentAlert()
 	{
 		while(true) 
 		{
@@ -106,23 +100,10 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 			{
 				return this.alertSource.getMostRecentAlert();
 			}
-			catch(Exception ignored) //we don't care about exceptions, we want to request forever until we get an alert
+			catch(Exception exception)
 			{
-				TimeUnit.MILLISECONDS.sleep(this.requestDelay.toMillis());
+				this.requestFailureHandler.accept(exception);
 			}
-		}
-	}
-
-	private Optional<Alert> getMostRecentAlert() 
-	{
-		try 
-		{
-			return Optional.of(this.alertSource.getMostRecentAlert());
-		}
-		catch(Exception exception) 
-		{
-			this.requestFailureHandler.accept(exception);
-			return Optional.empty();
 		}
 	}
 
