@@ -1,12 +1,11 @@
 package dte.tzevaadomapi.notifier;
 
 import static dte.tzevaadomapi.utils.UncheckedExceptions.unchecked;
-import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Arrays;
 import java.util.concurrent.CompletableFuture;
 
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,7 @@ public class TzevaAdomNotifierTest
 		Alert alert = new Alert("Tel Aviv", LocalDateTime.now());
 		when(this.alertSource.getMostRecentAlert()).thenReturn(alert, alert, alert);
 		
-		assertHistoryEquals(simulateNotifier(), alert);
+		assertEquals(0, simulateNotifier().getHistory().size());
 	}
 	
 	@Test
@@ -44,13 +43,7 @@ public class TzevaAdomNotifierTest
 		Alert secondAlert = new Alert("Haifa", LocalDateTime.now());
 		when(this.alertSource.getMostRecentAlert()).thenReturn(firstAlert, firstAlert, firstAlert, firstAlert, secondAlert);
 		
-		assertHistoryEquals(simulateNotifier(), firstAlert, secondAlert);
-	}
-	
-	
-	private static void assertHistoryEquals(TzevaAdomNotifier notifier, Alert... expectedHistory) 
-	{
-		assertIterableEquals(notifier.getHistory(), Arrays.asList(expectedHistory));
+		assertEquals(1, simulateNotifier().getHistory().size());
 	}
 	
 	/**
