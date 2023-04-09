@@ -81,11 +81,6 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 		return this.initialRequestTime;
 	}
 
-	public int size()
-	{
-		return this.history.size();
-	}
-
 	@Override
 	public Iterator<Alert> iterator() 
 	{
