@@ -28,29 +28,25 @@ public abstract class JSONAlertSource implements AlertSource
 	@Override
 	public Alert getMostRecentAlert() throws Exception
 	{
-		JSONArray alertsJSON = requestAlertsJSON();
+		JSONArray alertsJsonArray = requestAlertsJSON();
 		
-		if(alertsJSON == null || alertsJSON.isEmpty())
+		if(alertsJsonArray == null || alertsJsonArray.isEmpty())
 			throw new IllegalArgumentException("Cannot get the most recent alert due to an empty JSON response!");
 		
-		JSONObject mostRecentAlertJSON = (JSONObject) alertsJSON.get(0);
-		
-		return fromJSON(mostRecentAlertJSON);
+		return fromJSON((JSONObject) alertsJsonArray.get(0));
 	}
 	
-	protected abstract Alert fromJSON(JSONObject alertJSON);
+	protected abstract Alert fromJSON(JSONObject alertJson);
 	
 	private JSONArray requestAlertsJSON() throws Exception
 	{
-		String alertsJSONText;
-		
 		try(CloseableHttpClient httpClient = HttpClients.createDefault();
 				CloseableHttpResponse response = httpClient.execute(new HttpGet(this.requestURL))) 
 		{
 			HttpEntity entity = response.getEntity();
+			String alertsJsonText = (entity != null ? EntityUtils.toString(entity) : null);
 			
-			alertsJSONText = (entity != null ? EntityUtils.toString(entity) : null);
+			return (JSONArray) JSONValue.parse(alertsJsonText);
 		}
-		return (JSONArray) JSONValue.parse(alertsJSONText);
 	}
 }
