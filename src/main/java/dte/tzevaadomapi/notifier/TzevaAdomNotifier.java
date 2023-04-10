@@ -128,6 +128,11 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 			return this;
 		}
 		
+		public void listen() throws InterruptedException
+		{
+			build().listen();
+		}
+		
 		public TzevaAdomNotifier build()
 		{
 			Objects.requireNonNull(this.alertSource, "The source of the alerts must be provided!");
