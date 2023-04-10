@@ -24,8 +24,6 @@ public class TzevaAdomNotifierTest
 {
 	@Mock
 	private AlertSource alertSource;
-	
-	private static final Duration SIMULATION_DURATION = Duration.ofMillis(200);
 
 	@Test
 	public void testNotTzevaAdom() throws Exception 
@@ -33,7 +31,7 @@ public class TzevaAdomNotifierTest
 		Alert alert = createAlert("Tel Aviv");
 		
 		when(this.alertSource.getMostRecentAlert()).thenReturn(alert, alert, alert);
-		assertEquals(0, simulateNotifier().getHistory().size());
+		assertEquals(0, simulateNotifier(3).getHistory().size());
 	}
 	
 	@Test
@@ -43,7 +41,7 @@ public class TzevaAdomNotifierTest
 		Alert secondAlert = createAlert("Haifa");
 		
 		when(this.alertSource.getMostRecentAlert()).thenReturn(firstAlert, firstAlert, firstAlert, firstAlert, secondAlert);
-		assertEquals(1, simulateNotifier().getHistory().size());
+		assertEquals(1, simulateNotifier(5).getHistory().size());
 	}
 	
 	@Test
@@ -54,7 +52,7 @@ public class TzevaAdomNotifierTest
 		Alert thirdAlert = createAlert("Jerusalem");
 		
 		when(this.alertSource.getMostRecentAlert()).thenReturn(firstAlert, secondAlert, thirdAlert, firstAlert);
-		assertEquals(3, simulateNotifier().getHistory().size());
+		assertEquals(3, simulateNotifier(4).getHistory().size());
 	}
 	
 	private static Alert createAlert(String city) 
@@ -63,12 +61,12 @@ public class TzevaAdomNotifierTest
 	}
 	
 	/**
-	 * Runs a notifier(based on the mocked {@code alertSource}) for the defined <b>Simulation Duration</b>, and then returns it.
+	 * Runs a notifier that records the specified amount of dummy alerts, and then returns it.
 	 * 
 	 * @return A notifier after a simulated run.
 	 * @throws InterruptedException when the sleeping between requests fails.
 	 */
-	private TzevaAdomNotifier simulateNotifier() throws InterruptedException 
+	private TzevaAdomNotifier simulateNotifier(int alertsAmount) throws InterruptedException 
 	{
 		TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
 				.every(Duration.ofMillis(5))
@@ -77,7 +75,9 @@ public class TzevaAdomNotifierTest
 				.build();
 		
 		CompletableFuture.runAsync(unchecked(notifier::listen));
-		Thread.sleep(SIMULATION_DURATION.toMillis());
+		
+		//because I'm ahla gever, every alert gets 10ms to be recorded
+		Thread.sleep(Duration.ofMillis(alertsAmount * 10).toMillis());
 		
 		return notifier;
 	}
