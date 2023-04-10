@@ -13,6 +13,7 @@ import java.util.function.Consumer;
 
 import dte.tzevaadomapi.alert.Alert;
 import dte.tzevaadomapi.alertsource.AlertSource;
+import dte.tzevaadomapi.alertsource.PHOAlertSource;
 
 /**
  * Notifies registered listeners once a Tzeva Adom takes place.
@@ -35,6 +36,12 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 		this.alertSource = alertSource;
 		this.requestDelay = requestDelay;
 		this.requestFailureHandler = requestFailureHandler;
+	}
+	
+	public static Builder requestFromPikudHaoref() 
+	{
+		return new Builder()
+				.requestFrom(new PHOAlertSource());
 	}
 
 	public void listen() throws InterruptedException
