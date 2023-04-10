@@ -31,19 +31,30 @@ public class TzevaAdomNotifierTest
 	public void testNotTzevaAdom() throws Exception 
 	{
 		Alert alert = createAlert("Tel Aviv");
-		when(this.alertSource.getMostRecentAlert()).thenReturn(alert, alert, alert);
 		
+		when(this.alertSource.getMostRecentAlert()).thenReturn(alert, alert, alert);
 		assertEquals(0, simulateNotifier().getHistory().size());
 	}
 	
 	@Test
-	public void testTzevaAdomDetection() throws Exception
+	public void testTzevaAdom() throws Exception
 	{
 		Alert firstAlert = createAlert("Tel Aviv");
 		Alert secondAlert = createAlert("Haifa");
-		when(this.alertSource.getMostRecentAlert()).thenReturn(firstAlert, firstAlert, firstAlert, firstAlert, secondAlert);
 		
+		when(this.alertSource.getMostRecentAlert()).thenReturn(firstAlert, firstAlert, firstAlert, firstAlert, secondAlert);
 		assertEquals(1, simulateNotifier().getHistory().size());
+	}
+	
+	@Test
+	public void testConsecutiveTzevaAdom() throws Exception 
+	{
+		Alert firstAlert = createAlert("Tel Aviv");
+		Alert secondAlert = createAlert("Haifa");
+		Alert thirdAlert = createAlert("Jerusalem");
+		
+		when(this.alertSource.getMostRecentAlert()).thenReturn(firstAlert, secondAlert, thirdAlert, firstAlert);
+		assertEquals(3, simulateNotifier().getHistory().size());
 	}
 	
 	private static Alert createAlert(String city) 
