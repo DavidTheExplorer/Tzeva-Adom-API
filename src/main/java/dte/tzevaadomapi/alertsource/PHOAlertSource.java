@@ -22,11 +22,12 @@ public class PHOAlertSource extends JSONAlertSource
 	}
 	
 	@Override
-	protected Alert fromJSON(JSONObject alertJSON) 
+	protected Alert fromJSON(JSONObject alertJson) 
 	{
-		String city = (String) alertJSON.get("data");
-		LocalDateTime date = LocalDateTime.parse((String) alertJSON.get("alertDate"), DATE_FORMATTER);
+		String city = (String) alertJson.get("data");
+		String title = (String) alertJson.get("title");
+		LocalDateTime date = LocalDateTime.parse((String) alertJson.get("alertDate"), DATE_FORMATTER);
 		
-		return new Alert(city, date);
+		return new Alert(city, title, date);
 	}
 }
