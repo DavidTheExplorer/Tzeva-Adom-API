@@ -1,7 +1,6 @@
 package dte.tzevaadomapi.notifier;
 
 import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -30,8 +29,6 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 	private final Consumer<Exception> requestFailureHandler;
 	private final Set<Consumer<Alert>> listeners = new HashSet<>();
 	private final Deque<Alert> history = new LinkedList<>();
-
-	private LocalDateTime initialRequestTime;
 
 	private TzevaAdomNotifier(AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler) 
 	{
@@ -77,11 +74,6 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 		return new LinkedHashSet<>(this.history);
 	}
 
-	public LocalDateTime getInitialRequestTime() 
-	{
-		return this.initialRequestTime;
-	}
-
 	@Override
 	public Iterator<Alert> iterator() 
 	{
@@ -90,9 +82,6 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 
 	private Alert getMostRecentAlert()
 	{
-		if(this.initialRequestTime == null)
-			this.initialRequestTime = LocalDateTime.now();
-		
 		while(true) 
 		{
 			try 
