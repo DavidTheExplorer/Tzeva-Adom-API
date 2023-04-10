@@ -3,21 +3,44 @@ Simple Java API that listens to `Pikud Haoref's API` and notifies registered lis
 
 
 ## How to use
-All you need is a `TzevaAdomNotifier` object, let's create one that sends a message to the console when it's Tzeva Adom:
+Let's create a notifier object that logs a message when it's Tzeva Adom:
 ```java
-TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
+TzevaAdomNotifier
+        .requestFromPikudHaoref()
         .every(Duration.ofSeconds(3)) //amount of delay between requests
-        .requestFrom(new PHOAlertSource())
-        .onFailedRequest(exception -> System.err.println("Failed to send a request to Pikud Ha'oref..."))
-        .onTzevaAdom(alert -> System.out.println("Tzeva Adom at: " + alert.getCity()))
-        .build();
-        
-notifier.listen(); //throws InterruptedException due to the sleeping between requests
+        .onFailedRequest(exception -> LOGGER.error("Failed to send a request to Pikud Ha'oref...", exception))
+        .onTzevaAdom(alert -> LOGGER.info("Tzeva Adom at: " + alert.getCity()))
+        .listen();
 ```
 
+You can save the notifier object in order to add functionality or get data from it, by calling `build()` instead of `listen()`:
+```java
+TzevaAdomNotifier notifier = TzevaAdomNotifier
+        // builder pattern goes here
+        .build();
+        
+notifier.listen();
+```
+
+Adding Listeners anytime:
+```java
+notifier.addListener(alert -> ...);
+```
+
+Retrieving the Tzeva Adom Alerts encountered while running:
+```java
+TimeUnit.DAYS.sleep(1);
+LOGGER.info("There were {} alerts in the last 24 hours:", notifier.getHistory().size());
+
+//Pro Tip: TzevaAdomNotifier implements Iterable!
+for(Alert alert : notifier) 
+{
+        LOGGER.info("Alert in {} at {}", alert.getCity(), alert.getDate());
+}
+```
 
 ## How to import
-Maven(Jitpack) Repository:
+Maven Repository:
 ```xml
 <repository>
         <id>jitpack.io</id>
@@ -29,10 +52,16 @@ Maven(Jitpack) Repository:
 <dependency>
         <groupId>com.github.DavidTheExplorer</groupId>
         <artifactId>Tzeva-Adom-API</artifactId>
-        <version>master-SNAPSHOT</version>
+        <version>1.1.0</version>
 </dependency>
 ```
 
 
 ## Customization
-If your alerts come from anywhere else, you need to either implement `AlertSource` or inherit `JSONAlertSource` for JSON APIs.
+Relevant if Pikud Haoref's endpoint was changed or your alerts come from somewhere else.\
+\
+Either implement `AlertSource` or extend `JSONAlertSource` for JSON APIs, and then create your notifier like this:
+```
+new TzevaAdomNotifier.Builder()
+.requestFrom(new YourAlertSource())
+.listen();
