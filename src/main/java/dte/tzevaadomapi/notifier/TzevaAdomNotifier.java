@@ -44,8 +44,6 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 
 		while(true)
 		{
-			TimeUnit.MILLISECONDS.sleep(this.requestDelay.toMillis());
-
 			Alert alert = getMostRecentAlert();
 			
 			//if the last alert in history doesn't equal to the last requested one - It's TZEVA ADOM
@@ -80,11 +78,13 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 		return this.history.iterator();
 	}
 
-	private Alert getMostRecentAlert()
+	private Alert getMostRecentAlert() throws InterruptedException
 	{
-		while(true) 
+		while(true)
 		{
-			try 
+			TimeUnit.MILLISECONDS.sleep(this.requestDelay.toMillis());
+				
+			try
 			{
 				return this.alertSource.getMostRecentAlert();
 			}
