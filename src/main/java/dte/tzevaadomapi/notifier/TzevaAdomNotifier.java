@@ -40,7 +40,7 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 	public void listen() throws InterruptedException
 	{
 		//start with an initial alert - against which future alerts will be compared
-		Alert mostRecentAlert = getMostRecentAlert();
+		Alert lastTzevaAdom = getMostRecentAlert();
 
 		while(true)
 		{
@@ -49,10 +49,10 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 			Alert alert = getMostRecentAlert();
 			
 			//if the last alert in history doesn't equal to the last requested one - It's TZEVA ADOM
-			if(mostRecentAlert.equals(alert)) 
+			if(lastTzevaAdom.equals(alert)) 
 				continue;
 			
-			mostRecentAlert = alert;
+			lastTzevaAdom = alert;
 			
 			this.listeners.forEach(listener -> listener.accept(alert));
 			this.history.add(alert);
