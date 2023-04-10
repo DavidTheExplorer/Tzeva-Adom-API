@@ -101,7 +101,7 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 	{
 		private AlertSource alertSource;
 		private Duration requestDelay;
-		private Consumer<Exception> requestFailureHandler;
+		private Consumer<Exception> requestFailureHandler = (exception) -> {};
 		private Set<Consumer<Alert>> listeners = new HashSet<>();
 
 		public Builder requestFrom(AlertSource alertSource) 
@@ -132,7 +132,6 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 		{
 			Objects.requireNonNull(this.alertSource, "The source of the alerts must be provided!");
 			Objects.requireNonNull(this.requestDelay, "The delay between requesting alerts must be provided!");
-			Objects.requireNonNull(this.requestFailureHandler, "The alerts' request failure handler must be provided!");
 			
 			TzevaAdomNotifier notifier = new TzevaAdomNotifier(this.alertSource, this.requestDelay, this.requestFailureHandler);
 			this.listeners.forEach(notifier::addListener);
