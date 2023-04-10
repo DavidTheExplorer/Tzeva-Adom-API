@@ -6,17 +6,24 @@ import java.util.Objects;
 public class Alert
 {
 	private final String city;
+	private final String title;
 	private final LocalDateTime date;
 	
-	public Alert(String city, LocalDateTime date) 
+	public Alert(String city, String title, LocalDateTime date) 
 	{
 		this.city = city;
+		this.title = title;
 		this.date = date;
 	}
 	
 	public String getCity() 
 	{
 		return this.city;
+	}
+	
+	public String getTitle() 
+	{
+		return this.title;
 	}
 	
 	public LocalDateTime getDate() 
@@ -27,7 +34,7 @@ public class Alert
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(this.city, this.date);
+		return Objects.hash(this.city, this.title, this.date);
 	}
 	
 	@Override
@@ -41,12 +48,14 @@ public class Alert
 		
 		Alert other = (Alert) object;
 		
-		return Objects.equals(this.city, other.city) && Objects.equals(this.date, other.date);
+		return Objects.equals(this.city, other.city) && 
+				Objects.equals(this.title, other.title) &&
+				Objects.equals(this.date, other.date);
 	}
 	
 	@Override
 	public String toString()
 	{
-		return String.format("Alert [city=%s, date=%s]", this.city, this.date);
+		return String.format("Alert [city=%s, title=%s, date=%s]", this.city, this.title, this.date);
 	}
 }

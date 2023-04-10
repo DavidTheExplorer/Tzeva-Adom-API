@@ -25,8 +25,9 @@ public class PHOAlertSource extends JSONAlertSource
 	protected Alert fromJSON(JSONObject alertJson) 
 	{
 		String city = (String) alertJson.get("data");
+		String title = (String) alertJson.get("title");
 		LocalDateTime date = LocalDateTime.parse((String) alertJson.get("alertDate"), DATE_FORMATTER);
 		
-		return new Alert(city, date);
+		return new Alert(city, title, date);
 	}
 }
