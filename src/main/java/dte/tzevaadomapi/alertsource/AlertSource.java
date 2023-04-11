@@ -6,4 +6,7 @@ import dte.tzevaadomapi.alert.Alert;
 public interface AlertSource
 {
 	Alert getMostRecentAlert() throws Exception;
+	
+	
+	public static final Alert EMPTY_RESPONSE = null;
 }

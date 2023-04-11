@@ -31,7 +31,7 @@ public abstract class JSONAlertSource implements AlertSource
 		JSONArray alertsJsonArray = requestAlertsJSON();
 		
 		if(alertsJsonArray == null || alertsJsonArray.isEmpty())
-			throw new IllegalArgumentException("Cannot get the most recent alert due to an empty JSON response!");
+			return EMPTY_RESPONSE;
 		
 		return fromJSON((JSONObject) alertsJsonArray.get(0));
 	}

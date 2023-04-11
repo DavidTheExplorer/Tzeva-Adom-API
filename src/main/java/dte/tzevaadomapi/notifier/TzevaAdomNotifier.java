@@ -56,7 +56,11 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 			{
 				Alert alert = getMostRecentAlert();
 				
-				//if the last alert in history doesn't equal to the last requested one - It's TZEVA ADOM
+				//ignore empty responses
+				if(alert == AlertSource.EMPTY_RESPONSE)
+					continue;
+				
+				//if the last alert in history equals the the last requested - it's not Tzeva Adom
 				if(lastTzevaAdom.equals(alert)) 
 					continue;
 				
