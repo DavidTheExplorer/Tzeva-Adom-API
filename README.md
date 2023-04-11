@@ -61,7 +61,7 @@ Maven Repository:
 Relevant if Pikud Haoref's endpoint was changed or your alerts come from somewhere else.\
 \
 Either implement `AlertSource` or extend `JSONAlertSource` for JSON APIs, and then create your notifier like this:
-```
+```java
 new TzevaAdomNotifier.Builder()
 .requestFrom(new YourAlertSource())
 .listen();
