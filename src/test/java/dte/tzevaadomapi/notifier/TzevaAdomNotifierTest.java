@@ -1,12 +1,10 @@
 package dte.tzevaadomapi.notifier;
 
-import static dte.tzevaadomapi.utils.UncheckedExceptions.unchecked;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.concurrent.CompletableFuture;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -74,7 +72,7 @@ public class TzevaAdomNotifierTest
 				.onFailedRequest(Exception::printStackTrace)
 				.build();
 		
-		CompletableFuture.runAsync(unchecked(notifier::listen));
+		notifier.listen();
 		
 		//because I'm ahla gever, every alert gets 10ms to be recorded
 		Thread.sleep(Duration.ofMillis(alertsAmount * 10).toMillis());
