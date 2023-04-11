@@ -8,6 +8,7 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -44,24 +45,31 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 				.requestFrom(new PHOAlertSource());
 	}
 
-	public void listen() throws InterruptedException
+	public CompletableFuture<Void> listen()
 	{
-		//start with an initial alert - against which future alerts will be compared
-		Alert lastTzevaAdom = getMostRecentAlert();
-
-		while(true)
+		return CompletableFuture.runAsync(() -> 
 		{
-			Alert alert = getMostRecentAlert();
-			
-			//if the last alert in history doesn't equal to the last requested one - It's TZEVA ADOM
-			if(lastTzevaAdom.equals(alert)) 
-				continue;
-			
-			lastTzevaAdom = alert;
-			
-			this.listeners.forEach(listener -> listener.accept(alert));
-			this.history.add(alert);
-		}
+			//start with an initial alert - against which future alerts will be compared
+			Alert lastTzevaAdom = getMostRecentAlert();
+
+			while(true)
+			{
+				Alert alert = getMostRecentAlert();
+				
+				//ignore empty responses
+				if(alert == AlertSource.EMPTY_RESPONSE)
+					continue;
+				
+				//if the last alert in history equals the the last requested - it's not Tzeva Adom
+				if(lastTzevaAdom.equals(alert)) 
+					continue;
+				
+				lastTzevaAdom = alert;
+				
+				this.listeners.forEach(listener -> listener.accept(alert));
+				this.history.add(alert);
+			}
+		});
 	}
 
 	public void addListener(Consumer<Alert> tzevaAdomListener) 
@@ -85,14 +93,14 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 		return this.history.iterator();
 	}
 
-	private Alert getMostRecentAlert() throws InterruptedException
+	private Alert getMostRecentAlert()
 	{
 		while(true)
 		{
-			TimeUnit.MILLISECONDS.sleep(this.requestDelay.toMillis());
-				
 			try
 			{
+				TimeUnit.MILLISECONDS.sleep(this.requestDelay.toMillis());
+				
 				return this.alertSource.getMostRecentAlert();
 			}
 			catch(Exception exception)
@@ -135,9 +143,9 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 			return this;
 		}
 		
-		public void listen() throws InterruptedException
+		public CompletableFuture<Void> listen()
 		{
-			build().listen();
+			return build().listen();
 		}
 		
 		public TzevaAdomNotifier build()

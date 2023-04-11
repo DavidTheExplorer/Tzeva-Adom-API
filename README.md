@@ -1,19 +1,19 @@
 # Tzeva Adom API
-Simple Java API that listens to `Pikud Haoref's API` and notifies registered listeners once a Tzeva Adom takes place.
+Async Java API that listens to `Pikud Ha'oref API` and notifies registered listeners as soon as a Tzeva Adom happens.
 
 
 ## How to use
-Let's create a notifier object that logs a message when it's Tzeva Adom:
+Let's create a notifier that logs a message when it's Tzeva Adom:
 ```java
 TzevaAdomNotifier
         .requestFromPikudHaoref()
         .every(Duration.ofSeconds(3)) //amount of delay between requests
-        .onFailedRequest(exception -> LOGGER.error("Failed to send a request to Pikud Ha'oref...", exception))
+        .onFailedRequest(exception -> LOGGER.error("Failed to request the last alert from Pikud Ha'oref", exception))
         .onTzevaAdom(alert -> LOGGER.info("Tzeva Adom at: " + alert.getCity()))
-        .listen();
+        .listen(); //async
 ```
 
-You can save the notifier object in order to add functionality or get data from it, by calling `build()` instead of `listen()`:
+You can save the notifier object by calling `build()` instead of `listen()`, in order to add functionality or get data from it:
 ```java
 TzevaAdomNotifier notifier = TzevaAdomNotifier
         // builder pattern goes here
@@ -22,14 +22,17 @@ TzevaAdomNotifier notifier = TzevaAdomNotifier
 notifier.listen();
 ```
 
-Adding Listeners anytime:
+Add more listeners anytime:
 ```java
 notifier.addListener(alert -> ...);
 ```
 
-Retrieving the Tzeva Adom Alerts encountered while running:
+Retrieve the Tzeva Adom alerts encountered while running:
 ```java
+//run the notifier async and sleep for a day
+notifier.run();
 TimeUnit.DAYS.sleep(1);
+
 LOGGER.info("There were {} alerts in the last 24 hours:", notifier.getHistory().size());
 
 //Pro Tip: TzevaAdomNotifier implements Iterable!
