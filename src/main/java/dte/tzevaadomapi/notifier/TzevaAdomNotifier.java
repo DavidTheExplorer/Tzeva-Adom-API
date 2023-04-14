@@ -21,10 +21,8 @@ import dte.tzevaadomapi.alertsource.PHOAlertSource;
  * <p>
  * A request for the most recent alert is sent every constant duration, and the result is then compared to the previous one.
  * If the 2 alerts don't equal - It's <b>Tzeva Adom</b> and the registered listeners are notified.
- * <p>
- * This class implements <b>Iterable{@literal <Alert>}</b> which returns the history of Tzeva Adom alerts.
  */
-public class TzevaAdomNotifier implements Iterable<Alert>
+public class TzevaAdomNotifier
 {
 	private final AlertSource alertSource;
 	private final Duration requestDelay;
