@@ -21,15 +21,13 @@ import dte.tzevaadomapi.alertsource.PHOAlertSource;
  * <p>
  * A request for the most recent alert is sent every constant duration, and the result is then compared to the previous one.
  * If the 2 alerts don't equal - It's <b>Tzeva Adom</b> and the registered listeners are notified.
- * <p>
- * This class implements <b>Iterable{@literal <Alert>}</b> which returns the history of Tzeva Adom alerts.
  */
-public class TzevaAdomNotifier implements Iterable<Alert>
+public class TzevaAdomNotifier
 {
 	private final AlertSource alertSource;
 	private final Duration requestDelay;
 	private final Consumer<Exception> requestFailureHandler;
-	private final Set<Consumer<Alert>> listeners = new HashSet<>();
+	private final Set<TzevaAdomListener> listeners = new HashSet<>();
 	private final Deque<Alert> history = new LinkedList<>();
 
 	private TzevaAdomNotifier(AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler) 
@@ -66,15 +64,15 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 				
 				lastTzevaAdom = alert;
 				
-				this.listeners.forEach(listener -> listener.accept(alert));
+				this.listeners.forEach(listener -> listener.onTzevaAdom(alert));
 				this.history.add(alert);
 			}
 		});
 	}
 
-	public void addListener(Consumer<Alert> tzevaAdomListener) 
+	public void addListener(TzevaAdomListener listener) 
 	{
-		this.listeners.add(tzevaAdomListener);
+		this.listeners.add(listener);
 	}
 
 	public Alert getLastAlert()
@@ -117,7 +115,7 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 		private AlertSource alertSource;
 		private Duration requestDelay;
 		private Consumer<Exception> requestFailureHandler = (exception) -> {};
-		private Set<Consumer<Alert>> listeners = new HashSet<>();
+		private Set<TzevaAdomListener> listeners = new HashSet<>();
 
 		public Builder requestFrom(AlertSource alertSource) 
 		{
@@ -137,7 +135,7 @@ public class TzevaAdomNotifier implements Iterable<Alert>
 			return this;
 		}
 		
-		public Builder onTzevaAdom(Consumer<Alert> listener)
+		public Builder onTzevaAdom(TzevaAdomListener listener)
 		{
 			this.listeners.add(listener);
 			return this;
