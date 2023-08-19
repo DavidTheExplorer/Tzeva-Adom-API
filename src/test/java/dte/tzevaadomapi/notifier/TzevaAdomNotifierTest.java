@@ -84,7 +84,6 @@ public class TzevaAdomNotifierTest
 		TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
 				.every(Duration.ofMillis(5))
 				.requestFrom(this.alertSource)
-				.onFailedRequest(Exception::printStackTrace)
 				.build();
 		
 		notifier.listen();
