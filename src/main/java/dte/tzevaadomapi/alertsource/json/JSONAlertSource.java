@@ -31,7 +31,7 @@ public abstract class JSONAlertSource implements AlertSource
 		JSONArray alertsJsonArray = requestAlertsJSON();
 		
 		if(alertsJsonArray == null || alertsJsonArray.isEmpty())
-			return EMPTY_RESPONSE;
+			return NO_RESPONSE;
 		
 		return fromJSON((JSONObject) alertsJsonArray.get(0));
 	}

@@ -54,7 +54,7 @@ public class TzevaAdomNotifier
 				Alert alert = getMostRecentAlert();
 				
 				//ignore empty responses
-				if(alert == AlertSource.EMPTY_RESPONSE)
+				if(alert == AlertSource.NO_RESPONSE)
 					continue;
 				
 				//if the last alert in history equals the the last requested - it's not Tzeva Adom
