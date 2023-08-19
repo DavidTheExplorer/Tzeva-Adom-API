@@ -58,7 +58,7 @@ public class TzevaAdomNotifier
 					continue;
 				
 				//if the last alert in history equals the the last requested - it's not Tzeva Adom
-				if(lastTzevaAdom.equals(alert)) 
+				if(alert.equals(lastTzevaAdom)) 
 					continue;
 				
 				lastTzevaAdom = alert;

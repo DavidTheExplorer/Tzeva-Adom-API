@@ -6,6 +6,7 @@ import static org.mockito.Mockito.when;
 import java.time.Duration;
 import java.time.LocalDateTime;
 
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.TestInstance.Lifecycle;
@@ -51,6 +52,20 @@ public class TzevaAdomNotifierTest
 		
 		when(this.alertSource.getMostRecentAlert()).thenReturn(firstAlert, secondAlert, thirdAlert, firstAlert);
 		assertEquals(3, simulateNotifier(4).getHistory().size());
+	}
+	
+	@Test
+	@DisplayName("The usual request flow where 99% are no responses")
+	public void testUsualRoutine() throws Exception 
+	{
+		when(this.alertSource.getMostRecentAlert()).thenReturn(
+				AlertSource.NO_RESPONSE,
+				AlertSource.NO_RESPONSE, 
+				AlertSource.NO_RESPONSE, 
+				AlertSource.NO_RESPONSE,  
+				createAlert("Tel Aviv"));
+		
+		assertEquals(1, simulateNotifier(5).getHistory().size());
 	}
 	
 	private static Alert createAlert(String city) 
