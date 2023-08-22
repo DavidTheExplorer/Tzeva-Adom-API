@@ -1,25 +1,26 @@
 # Tzeva Adom API
-Async Java API that listens to `Pikud Ha'oref API` and notifies registered listeners as soon as a Tzeva Adom happens.
+Async Java API that listens to `Pikud Ha'oref` and notifies registered listeners as soon as a Tzeva Adom happens.
 
 
 ## How to use
 Let's create a notifier that logs a message when it's Tzeva Adom:
 ```java
 TzevaAdomNotifier
-        .requestFromPikudHaoref()
+        .basedOnPikudHaoref()
         .every(Duration.ofSeconds(3)) //amount of delay between requests
         .onFailedRequest(exception -> LOGGER.error("Failed to request the last alert from Pikud Ha'oref", exception))
         .onTzevaAdom(alert -> LOGGER.info("Tzeva Adom at: " + alert.getCity()))
         .listen(); //async
 ```
 
-You can save the notifier object by calling `build()` instead of `listen()`, in order to add functionality or get data from it:
+You can save the notifier object by calling `build()` instead of `listen()` in order to add functionality or get data:
 ```java
-TzevaAdomNotifier notifier = TzevaAdomNotifier
-        // builder pattern goes here
+TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
+        // the rest of the builder pattern
         .build();
-        
-notifier.listen();
+
+// later  
+Alert lastAlert = notifier.getLastAlert();
 ```
 
 Add more listeners anytime:
@@ -30,13 +31,12 @@ notifier.addListener(alert -> ...);
 Retrieve the Tzeva Adom alerts encountered while running:
 ```java
 //run the notifier async and sleep for a day
-notifier.run();
+notifier.listen();
 TimeUnit.DAYS.sleep(1);
 
 LOGGER.info("There were {} alerts in the last 24 hours:", notifier.getHistory().size());
 
-//Pro Tip: TzevaAdomNotifier implements Iterable!
-for(Alert alert : notifier) 
+for(Alert alert : notifier.getHistory()) 
 {
         LOGGER.info("Alert in {} at {}", alert.getCity(), alert.getDate());
 }
@@ -55,7 +55,7 @@ Maven Repository:
 <dependency>
         <groupId>com.github.DavidTheExplorer</groupId>
         <artifactId>Tzeva-Adom-API</artifactId>
-        <version>1.1.0</version>
+        <version>1.4.0</version>
 </dependency>
 ```
 
@@ -67,4 +67,3 @@ Either implement `AlertSource` or extend `JSONAlertSource` for JSON APIs, and th
 ```java
 new TzevaAdomNotifier.Builder()
 .requestFrom(new YourAlertSource())
-.listen();
