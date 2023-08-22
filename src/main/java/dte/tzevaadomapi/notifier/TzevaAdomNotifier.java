@@ -16,10 +16,14 @@ import dte.tzevaadomapi.alertsource.AlertSource;
 import dte.tzevaadomapi.alertsource.PHOAlertSource;
 
 /**
- * Notifies registered listeners once a Tzeva Adom takes place.
+ * Notifies registered listeners once a <b>Tzeva Adom</b> takes place.
  * <p>
- * A request for the most recent alert is sent every constant duration, and the result is then compared to the previous one.
- * If the 2 alerts don't equal - It's <b>Tzeva Adom</b> and the registered listeners are notified.
+ * The workflow of the notifier is:
+ * <ol>
+ * 	<li> Request the most recent alert sent every constant duration(typically ~2 seconds)
+ * 	<li> Compare it to the previous one, or store the first result:
+ * 	<li> If the 2 alerts are not identical, It's <b>Tzeva Adom</b> - and the listeners are notified immediately.
+ * </ol>
  */
 public class TzevaAdomNotifier
 {
@@ -42,6 +46,12 @@ public class TzevaAdomNotifier
 				.requestFrom(new PHOAlertSource());
 	}
 
+	/**
+	 * Starts listening and reacting to <b>Tzeva Adom</b> on a separate Thread, 
+	 * and returns the the corresponding {@link CompletableFuture} object for further control.
+	 * 
+	 * @return The {@link CompletableFuture} responsible of reacting to <b>Tzeva Adoms</b>.
+	 */
 	public CompletableFuture<Void> listen()
 	{
 		return CompletableFuture.runAsync(() -> 

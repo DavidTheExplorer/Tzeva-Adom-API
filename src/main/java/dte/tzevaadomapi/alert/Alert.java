@@ -3,6 +3,9 @@ package dte.tzevaadomapi.alert;
 import java.time.LocalDateTime;
 import java.util.Objects;
 
+/**
+ * Represents a <b>Tzeva Adom</b> alert and contains information about where/when it happened.
+ */
 public class Alert
 {
 	private final String city;
