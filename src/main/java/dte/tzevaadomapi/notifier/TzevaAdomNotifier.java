@@ -40,7 +40,7 @@ public class TzevaAdomNotifier
 		this.requestFailureHandler = requestFailureHandler;
 	}
 	
-	public static Builder requestFromPikudHaoref() 
+	public static Builder basedOnPikudHaoref() 
 	{
 		return new Builder()
 				.requestFrom(new PHOAlertSource());
