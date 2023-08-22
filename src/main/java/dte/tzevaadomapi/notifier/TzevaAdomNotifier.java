@@ -40,6 +40,10 @@ public class TzevaAdomNotifier
 		this.requestFailureHandler = requestFailureHandler;
 	}
 	
+	/**
+	 * @deprecated Pikud Ha'oref now provides Alerts by default(overridable) - Use the Builder directly.
+	 */
+	@Deprecated
 	public static Builder basedOnPikudHaoref() 
 	{
 		return new Builder()
@@ -115,10 +119,12 @@ public class TzevaAdomNotifier
 
 	public static class Builder
 	{
-		private AlertSource alertSource;
+		private AlertSource alertSource = PIKUD_HAOREF;
 		private Duration requestDelay;
 		private Consumer<Exception> requestFailureHandler = (exception) -> {};
 		private Set<TzevaAdomListener> listeners = new HashSet<>();
+		
+		private static final AlertSource PIKUD_HAOREF = new PHOAlertSource();
 
 		public Builder requestFrom(AlertSource alertSource) 
 		{
