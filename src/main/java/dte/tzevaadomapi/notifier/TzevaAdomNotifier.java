@@ -47,7 +47,7 @@ public class TzevaAdomNotifier
 	public static Builder basedOnPikudHaoref() 
 	{
 		return new Builder()
-				.requestFrom(new PHOAlertSource());
+				.from(new PHOAlertSource());
 	}
 
 	/**
@@ -126,13 +126,13 @@ public class TzevaAdomNotifier
 		
 		private static final AlertSource PIKUD_HAOREF = new PHOAlertSource();
 
-		public Builder requestFrom(AlertSource alertSource) 
+		public Builder from(AlertSource alertSource) 
 		{
 			this.alertSource = alertSource;
 			return this;
 		}
 
-		public Builder every(Duration requestDelay) 
+		public Builder requestEvery(Duration requestDelay) 
 		{
 			this.requestDelay = requestDelay;
 			return this;

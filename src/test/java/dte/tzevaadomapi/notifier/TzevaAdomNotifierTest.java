@@ -82,8 +82,8 @@ public class TzevaAdomNotifierTest
 	private TzevaAdomNotifier simulateNotifier(int alertsAmount) throws InterruptedException 
 	{
 		TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
-				.every(Duration.ofMillis(5))
-				.requestFrom(this.alertSource)
+				.requestEvery(Duration.ofMillis(5))
+				.from(this.alertSource)
 				.build();
 		
 		notifier.listen();
