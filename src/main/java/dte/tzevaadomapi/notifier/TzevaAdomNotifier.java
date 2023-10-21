@@ -3,7 +3,6 @@ package dte.tzevaadomapi.notifier;
 import java.time.Duration;
 import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -82,9 +81,9 @@ public class TzevaAdomNotifier
 		return this.history.peekLast();
 	}
 
-	public Set<Alert> getHistory()
+	public Deque<Alert> getHistory()
 	{
-		return new LinkedHashSet<>(this.history);
+		return new LinkedList<>(this.history);
 	}
 
 	private Alert getMostRecentAlert()
