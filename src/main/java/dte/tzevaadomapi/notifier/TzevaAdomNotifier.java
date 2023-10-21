@@ -40,16 +40,6 @@ public class TzevaAdomNotifier
 	}
 	
 	/**
-	 * @deprecated Pikud Ha'oref now provides Alerts by default(overridable) - Use the Builder directly.
-	 */
-	@Deprecated
-	public static Builder basedOnPikudHaoref() 
-	{
-		return new Builder()
-				.requestFrom(new PHOAlertSource());
-	}
-
-	/**
 	 * Starts listening and reacting to <b>Tzeva Adom</b> on a separate Thread, 
 	 * and returns the the corresponding {@link CompletableFuture} object for further control.
 	 * 
