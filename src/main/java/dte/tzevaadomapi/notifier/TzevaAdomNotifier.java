@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -76,9 +77,9 @@ public class TzevaAdomNotifier
 		this.listeners.add(listener);
 	}
 
-	public Alert getLastAlert()
+	public Optional<Alert> getLastAlert()
 	{
-		return this.history.peekLast();
+		return Optional.ofNullable(this.history.peekLast());
 	}
 
 	public Deque<Alert> getHistory()
