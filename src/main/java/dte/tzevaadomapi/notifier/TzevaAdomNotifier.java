@@ -5,7 +5,6 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -47,7 +46,7 @@ public class TzevaAdomNotifier
 	public static Builder basedOnPikudHaoref() 
 	{
 		return new Builder()
-				.from(new PHOAlertSource());
+				.requestFrom(new PHOAlertSource());
 	}
 
 	/**
@@ -119,14 +118,12 @@ public class TzevaAdomNotifier
 
 	public static class Builder
 	{
-		private AlertSource alertSource = PIKUD_HAOREF;
-		private Duration requestDelay;
+		private AlertSource alertSource = new PHOAlertSource(); //obviously Pikud Ha'oref is the default source
+		private Duration requestDelay = Duration.ofMillis(500); //half a second is a reasonable delay
 		private Consumer<Exception> requestFailureHandler = (exception) -> {};
 		private Set<TzevaAdomListener> listeners = new HashSet<>();
 		
-		private static final AlertSource PIKUD_HAOREF = new PHOAlertSource();
-
-		public Builder from(AlertSource alertSource) 
+		public Builder requestFrom(AlertSource alertSource) 
 		{
 			this.alertSource = alertSource;
 			return this;
@@ -157,9 +154,6 @@ public class TzevaAdomNotifier
 		
 		public TzevaAdomNotifier build()
 		{
-			Objects.requireNonNull(this.alertSource, "The source of the alerts must be provided!");
-			Objects.requireNonNull(this.requestDelay, "The delay between requesting alerts must be provided!");
-			
 			TzevaAdomNotifier notifier = new TzevaAdomNotifier(this.alertSource, this.requestDelay, this.requestFailureHandler);
 			this.listeners.forEach(notifier::addListener);
 
