@@ -83,7 +83,7 @@ public class TzevaAdomNotifierTest
 	{
 		TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
 				.requestEvery(Duration.ofMillis(5))
-				.from(this.alertSource)
+				.requestFrom(this.alertSource)
 				.build();
 		
 		notifier.listen();

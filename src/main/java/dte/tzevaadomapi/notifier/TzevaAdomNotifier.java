@@ -1,10 +1,7 @@
 package dte.tzevaadomapi.notifier;
 
 import java.time.Duration;
-import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -30,7 +27,7 @@ public class TzevaAdomNotifier
 	private final Duration requestDelay;
 	private final Consumer<Exception> requestFailureHandler;
 	private final Set<TzevaAdomListener> listeners = new HashSet<>();
-	private final Deque<Alert> history = new LinkedList<>();
+	private final TzevaAdomHistory history = new TzevaAdomHistory();
 
 	private TzevaAdomNotifier(AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler) 
 	{
@@ -77,14 +74,9 @@ public class TzevaAdomNotifier
 		this.listeners.add(listener);
 	}
 
-	public Optional<Alert> getLastAlert()
+	public TzevaAdomHistory getHistory()
 	{
-		return Optional.ofNullable(this.history.peekLast());
-	}
-
-	public Deque<Alert> getHistory()
-	{
-		return new LinkedList<>(this.history);
+		return this.history;
 	}
 
 	private Alert getMostRecentAlert()
