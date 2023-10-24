@@ -1,18 +1,22 @@
 package dte.tzevaadomapi.alertsource;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
+
+import java.io.InputStreamReader;
+import java.lang.reflect.Type;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.JSONValue;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
+import com.google.gson.stream.JsonReader;
 
 import dte.tzevaadomapi.alert.Alert;
 
@@ -23,37 +27,41 @@ public class PHOAlertSource implements AlertSource
 {
 	private static final String REQUEST_URL = "https://www.oref.org.il/WarningMessages/History/AlertsHistory.json";
 	
-	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+	private static final Gson GSON = new GsonBuilder()
+			.registerTypeAdapter(Alert.class, new AlertDeserializer())
+			.create();
 	
 	@Override
 	public Alert getMostRecentAlert() throws Exception
 	{
-		JSONArray alertsJsonArray = requestAlertsJSON();
-		
-		if(alertsJsonArray == null || alertsJsonArray.isEmpty())
-			return NO_RESPONSE;
-		
-		return parseAlert((JSONObject) alertsJsonArray.get(0));
-	}
-	
-	private JSONArray requestAlertsJSON() throws Exception
-	{
-		try(CloseableHttpClient httpClient = HttpClients.createDefault();
-				CloseableHttpResponse response = httpClient.execute(new HttpGet(REQUEST_URL))) 
+		try(JsonReader reader = new JsonReader(new InputStreamReader(new URL(REQUEST_URL).openStream(), UTF_8)))
 		{
-			HttpEntity entity = response.getEntity();
-			String alertsJsonText = (entity != null ? EntityUtils.toString(entity) : null);
+			reader.beginArray();
 			
-			return (JSONArray) JSONValue.parse(alertsJsonText);
+			//read the first alert in the list
+			return GSON.fromJson(reader, Alert.class);
+		}
+		catch(Exception exception) 
+		{
+			throw new RuntimeException(String.format("Could not contact Pikud Ha'oref due to %s", exception));
 		}
 	}
 	
-	private Alert parseAlert(JSONObject alertJson) 
+	
+	
+	private static class AlertDeserializer implements JsonDeserializer<Alert>
 	{
-		String city = (String) alertJson.get("data");
-		String title = (String) alertJson.get("title");
-		LocalDateTime date = LocalDateTime.parse((String) alertJson.get("alertDate"), DATE_FORMATTER);
-		
-		return new Alert(city, title, date);
+		private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+
+		@Override
+		public Alert deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException 
+		{
+			JsonObject object = json.getAsJsonObject();
+			String city = object.get("data").getAsString();
+			String title = object.get("title").getAsString();
+			LocalDateTime date = LocalDateTime.parse(object.get("alertDate").getAsString(), DATE_FORMATTER);
+
+			return new Alert(city, title, date);
+		}
 	}
 }
