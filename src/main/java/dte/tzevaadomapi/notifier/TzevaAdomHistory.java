@@ -2,6 +2,7 @@ package dte.tzevaadomapi.notifier;
 
 import static java.util.stream.Collectors.toList;
 
+import java.util.Collection;
 import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -14,9 +15,14 @@ public class TzevaAdomHistory implements Iterable<Alert>
 {
 	private final Deque<Alert> history = new LinkedList<>();
 	
-	public void add(Alert alert) 
+	public void update(Alert alert) 
 	{
 		this.history.add(alert);
+	}
+	
+	public void update(Collection<Alert> alerts)
+	{
+		this.history.addAll(alerts);
 	}
 	
 	public Optional<Alert> getMostRecent()

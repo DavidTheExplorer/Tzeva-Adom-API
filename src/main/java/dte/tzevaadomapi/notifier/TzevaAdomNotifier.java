@@ -1,6 +1,7 @@
 package dte.tzevaadomapi.notifier;
 
 import java.time.Duration;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
@@ -10,6 +11,7 @@ import java.util.function.Consumer;
 import dte.tzevaadomapi.alert.Alert;
 import dte.tzevaadomapi.alertsource.AlertSource;
 import dte.tzevaadomapi.alertsource.PHOAlertSource;
+import dte.tzevaadomapi.utils.UncheckedExceptions.CheckedSupplier;
 
 /**
  * Notifies registered listeners once a <b>Tzeva Adom</b> takes place.
@@ -28,6 +30,9 @@ public class TzevaAdomNotifier
 	private final Consumer<Exception> requestFailureHandler;
 	private final Set<TzevaAdomListener> listeners = new HashSet<>();
 	private final TzevaAdomHistory history = new TzevaAdomHistory();
+	
+	//should have been a local variable in listen(), but that causes the effectively final problem
+	private Alert mostRecentAlert;
 
 	private TzevaAdomNotifier(AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler) 
 	{
@@ -35,7 +40,7 @@ public class TzevaAdomNotifier
 		this.requestDelay = requestDelay;
 		this.requestFailureHandler = requestFailureHandler;
 	}
-	
+
 	/**
 	 * Starts listening and reacting to <b>Tzeva Adom</b> on a separate Thread, 
 	 * and returns the the corresponding {@link CompletableFuture} object for further control.
@@ -46,25 +51,23 @@ public class TzevaAdomNotifier
 	{
 		return CompletableFuture.runAsync(() -> 
 		{
-			//start with an initial alert - against which future alerts will be compared
-			Alert lastTzevaAdom = getMostRecentAlert();
-
-			while(true)
+			//start with the most recent alert
+			this.mostRecentAlert = requestMostRecentAlert();
+			
+			while(true)	
 			{
-				Alert alert = getMostRecentAlert();
+				Deque<Alert> newAlerts = request(() -> this.alertSource.getSince(this.mostRecentAlert));
 				
-				//ignore empty responses
-				if(alert == AlertSource.NO_RESPONSE)
+				//if there are no new alerts - it's not Tzeva Adom
+				if(newAlerts.isEmpty()) 
 					continue;
 				
-				//if the last alert in history equals the the last requested - it's not Tzeva Adom
-				if(alert.equals(lastTzevaAdom)) 
-					continue;
+				//update the history variables
+				this.mostRecentAlert = newAlerts.getFirst();
+				this.history.update(newAlerts);
 				
-				lastTzevaAdom = alert;
-				
-				this.listeners.forEach(listener -> listener.onTzevaAdom(alert));
-				this.history.add(alert);
+				//notify Tzeva Adom
+				newAlerts.forEach(this::notifyListeners);
 			}
 		});
 	}
@@ -78,22 +81,43 @@ public class TzevaAdomNotifier
 	{
 		return this.history;
 	}
+	
+	private Alert requestMostRecentAlert() 
+	{
+		Alert alert;
+		
+		//wait until Hamas decides to launch rockets
+		do 
+		{
+			alert = request(this.alertSource::getMostRecentAlert);
+		}
+		while(alert == AlertSource.NO_RESULT);
+		
+		return alert;
+	}
 
-	private Alert getMostRecentAlert()
+	private <R> R request(CheckedSupplier<R> resultFactory)
 	{
 		while(true)
 		{
-			try
+			try 
 			{
+				//sleep a reasonable amount of time
 				TimeUnit.MILLISECONDS.sleep(this.requestDelay.toMillis());
 				
-				return this.alertSource.getMostRecentAlert();
+				return resultFactory.get();
 			}
-			catch(Exception exception)
+			catch(Exception exception) 
 			{
+				//pass the exception to the handler
 				this.requestFailureHandler.accept(exception);
 			}
 		}
+	}
+	
+	private void notifyListeners(Alert alert)
+	{
+		this.listeners.forEach(listener -> listener.onTzevaAdom(alert));
 	}
 
 
@@ -104,7 +128,7 @@ public class TzevaAdomNotifier
 		private Duration requestDelay = Duration.ofMillis(500); //half a second is a reasonable delay
 		private Consumer<Exception> requestFailureHandler = (exception) -> {};
 		private Set<TzevaAdomListener> listeners = new HashSet<>();
-		
+
 		public Builder requestFrom(AlertSource alertSource) 
 		{
 			this.alertSource = alertSource;
@@ -116,24 +140,24 @@ public class TzevaAdomNotifier
 			this.requestDelay = requestDelay;
 			return this;
 		}
-		
+
 		public Builder onFailedRequest(Consumer<Exception> handler) 
 		{
 			this.requestFailureHandler = handler;
 			return this;
 		}
-		
+
 		public Builder onTzevaAdom(TzevaAdomListener listener)
 		{
 			this.listeners.add(listener);
 			return this;
 		}
-		
+
 		public CompletableFuture<Void> listen()
 		{
 			return build().listen();
 		}
-		
+
 		public TzevaAdomNotifier build()
 		{
 			TzevaAdomNotifier notifier = new TzevaAdomNotifier(this.alertSource, this.requestDelay, this.requestFailureHandler);
