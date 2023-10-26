@@ -64,6 +64,7 @@ public class PHOAlertSource implements AlertSource
 		});
 	}
 	
+	//starts reading the JSON list posted by Pikud Ha'oref, and applies the function on it
 	private <T> T readJsonArray(CheckedFunction<JsonReader, T> resultParser) 
 	{
 		try(JsonReader reader = new JsonReader(new InputStreamReader(REQUEST_URL.openStream(), UTF_8)))

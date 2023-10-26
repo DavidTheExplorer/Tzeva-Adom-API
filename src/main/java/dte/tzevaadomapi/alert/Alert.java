@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.Objects;
 
 /**
- * Represents a <b>Tzeva Adom</b> alert and contains information about where/when it happened.
+ * Represents a <b>Tzeva Adom</b> and provides information about it.
  */
 public class Alert
 {
@@ -19,16 +19,31 @@ public class Alert
 		this.date = date;
 	}
 	
+	/**
+	 * Returns the city where this alert happened.
+	 * 
+	 * @return The city.
+	 */
 	public String getCity() 
 	{
 		return this.city;
 	}
 	
+	/**
+	 * Describes the cause of this alert - what happened that had caused it to happen.
+	 * 
+	 * @return This alert's description.
+	 */
 	public String getTitle() 
 	{
 		return this.title;
 	}
 	
+	/**
+	 * Returns when this alert happened.
+	 * 
+	 * @return This alert's date.
+	 */
 	public LocalDateTime getDate() 
 	{
 		return this.date;

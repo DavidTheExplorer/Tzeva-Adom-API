@@ -14,14 +14,7 @@ import dte.tzevaadomapi.alertsource.PHOAlertSource;
 import dte.tzevaadomapi.utils.UncheckedExceptions.CheckedSupplier;
 
 /**
- * Notifies registered listeners once a <b>Tzeva Adom</b> takes place.
- * <p>
- * The workflow of the notifier is:
- * <ol>
- * 	<li> Request the most recent alert sent every constant duration(typically ~2 seconds)
- * 	<li> Compare it to the previous one, or store the first result:
- * 	<li> If the 2 alerts are not identical, It's <b>Tzeva Adom</b> - and the listeners are notified immediately.
- * </ol>
+ * Notifies registered listeners immediately once a <b>Tzeva Adom</b> takes place.
  */
 public class TzevaAdomNotifier
 {
@@ -31,7 +24,7 @@ public class TzevaAdomNotifier
 	private final Set<TzevaAdomListener> listeners = new HashSet<>();
 	private final TzevaAdomHistory history = new TzevaAdomHistory();
 	
-	//should have been a local variable in listen(), but that causes the effectively final problem
+	//used to be a local variable in listen(), until it caused the effectively final problem
 	private Alert mostRecentAlert;
 
 	private TzevaAdomNotifier(AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler) 
@@ -42,10 +35,11 @@ public class TzevaAdomNotifier
 	}
 
 	/**
-	 * Starts listening and reacting to <b>Tzeva Adom</b> on a separate Thread, 
-	 * and returns the the corresponding {@link CompletableFuture} object for further control.
+	 * Starts an async listening to incoming alerts, and returns the corresponding {@link CompletableFuture} object for further control.
+	 * <p>
+	 * This method can be sync by calling {@code join()} on the result.
 	 * 
-	 * @return The {@link CompletableFuture} responsible of reacting to <b>Tzeva Adoms</b>.
+	 * @return The wrapping {@link CompletableFuture} object.
 	 */
 	public CompletableFuture<Void> listen()
 	{
@@ -71,12 +65,22 @@ public class TzevaAdomNotifier
 			}
 		});
 	}
-
+	
+	/**
+	 * Adds a listener to notify when it's Tzeva Adom.
+	 * 
+	 * @param listener The listener.
+	 */
 	public void addListener(TzevaAdomListener listener) 
 	{
 		this.listeners.add(listener);
 	}
-
+	
+	/**
+	 * Returns the Tzeva Adom history since {@link #listen()} was called for this notifier.
+	 * 
+	 * @return The tzeva adom history.
+	 */
 	public TzevaAdomHistory getHistory()
 	{
 		return this.history;
