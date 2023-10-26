@@ -90,11 +90,11 @@ public class TzevaAdomNotifierTest
 		assertEquals(1, simulateNotifier().size());
 	}
 	
-	private static Alert createAlert(String city) 
+	private static Alert createAlert(String region) 
 	{
 		String randomTitle = ThreadLocalRandom.current().nextBoolean() ? "חדירת מחבלים" : "חדירת כלי טיס עוין";
 		
-		return new Alert(city, randomTitle, LocalDateTime.now());
+		return new Alert(region, randomTitle, LocalDateTime.now());
 	}
 	
 	/**

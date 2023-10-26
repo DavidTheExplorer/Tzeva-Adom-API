@@ -46,15 +46,15 @@ public class TzevaAdomHistory implements Iterable<Alert>
 	}
 	
 	/**
-	 * Returns the list of alerts that happened in a provided {@code city} since the underlying notifier was started.
+	 * Returns the list of alerts that happened in a provided {@code region} since the underlying notifier was started.
 	 * 
-	 * @param city The city, may be partial.
-	 * @return The city's history.
+	 * @param region The region, may be partial.
+	 * @return The region's history.
 	 */
-	public List<Alert> ofCity(String city)
+	public List<Alert> ofRegion(String region)
 	{
 		return this.history.stream()
-				.filter(alert -> alert.getCity().contains(city))
+				.filter(alert -> alert.getRegion().contains(region))
 				.collect(toList());
 	}
 	

@@ -89,11 +89,11 @@ public class PHOAlertSource implements AlertSource
 		public Alert deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException 
 		{
 			JsonObject object = json.getAsJsonObject();
-			String city = object.get("data").getAsString();
+			String region = object.get("data").getAsString();
 			String title = object.get("title").getAsString();
 			LocalDateTime date = LocalDateTime.parse(object.get("alertDate").getAsString(), DATE_FORMATTER);
 
-			return new Alert(city, title, date);
+			return new Alert(region, title, date);
 		}
 	}
 }
