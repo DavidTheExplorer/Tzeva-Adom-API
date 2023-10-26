@@ -1,40 +1,39 @@
 # Tzeva Adom API
-Async Java API that listens to `Pikud Ha'oref` and notifies registered listeners as soon as a Tzeva Adom happens.
+Async Java API that listens to `Pikud Ha'oref` and notifies registered listeners as soon as a Tzeva Adom happens.\
+Integrating it in projects(games, etc) used by many israelis, **increases** the chances of saving lives.
 
 ## How to use
-Let's create a notifier that stops a game when it's Tzeva Adom:
+Let's create a notifier that is responsible of stopping your addicting game:
 ```java
 Game game = ...;
 
 TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
-        .every(Duration.ofSeconds(3))
         .onFailedRequest(exception -> LOGGER.error("Failed to request the last alert from Pikud Ha'oref", exception))
         .onTzevaAdom(alert ->
         {
                 game.stop();
-                game.sendMessage("There is a Tzeva Adom in: " + alert.getCity());
+                game.sendMessage("There is a Tzeva Adom in: " + alert.getRegion());
         })
         .build();
 	
 notifier.listen(); //async
 ```
-
-By saving the notifier object, you can gather information while your program is running.\
-Here is an example:
+\
+By saving the notifier object, you can gather information while your program is running:
 ```java
-notifier.listen();
+notifier.listen(); //async - anything else is sync
 
 //sleep for a day
 TimeUnit.DAYS.sleep(1);
 
-Set<Alert> history = notifier.getHistory();
-
-LOGGER.info("There were {} alerts in the last 24 hours:", history.size());
-
-for(Alert alert : history) 
+//print all the alerts from the last day
+for(Alert alert : notifier.getHistory()) 
 {
-        LOGGER.info("Alert in {} at {}", alert.getCity(), alert.getDate());
+        LOGGER.warn("Alert at {} was in {}", alert.getCity(), alert.getDate());
 }
+
+//check a specific city's alerts
+List<Alert> telAvivAlerts = notifier.getHistory().ofRegion("תל אביב");
 ```
 
 ## How to import
@@ -50,15 +49,21 @@ Maven Repository:
 <dependency>
         <groupId>com.github.DavidTheExplorer</groupId>
         <artifactId>Tzeva-Adom-API</artifactId>
-        <version>1.4.0</version>
+        <version>1.5.0</version>
 </dependency>
 ```
 
 
-## Customization
-Relevant if the endpoint of Pikud Ha'oref was changed or your alerts come from somewhere else.\
-\
-Either implement `AlertSource` or extend `JSONAlertSource` for JSON APIs, and then create your notifier like this:
-```java
-new TzevaAdomNotifier.Builder()
-.requestFrom(new YourAlertSource())
+## Builder Options
+Everything in the library is customizable.
+-  If the endpoint of Pikud Ha'oref was changed or your alerts come from somewhere else:\
+   Implement `AlertSource` and then create your notifier like this:
+   ```java
+   new TzevaAdomNotifier.Builder()
+   .requestFrom(new YourAlertSource())
+   ```
+- If you want to lower the frequency of the Tzeva Adom checks, create your notifier like this:
+  ```java
+  new TzevaAdomNotifier.Builder()
+  .requestEvery(Duration.ofSeconds(3))
+  ```
