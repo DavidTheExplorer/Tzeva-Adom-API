@@ -1,10 +1,15 @@
 package dte.tzevaadomapi.notifier;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,74 +28,98 @@ public class TzevaAdomNotifierTest
 {
 	@Mock
 	private AlertSource alertSource;
-
+	
+	private static final Deque<Alert> NO_UPDATES = new LinkedList<>();
+	
 	@Test
 	public void testNotTzevaAdom() throws Exception 
 	{
 		Alert alert = createAlert("Tel Aviv");
 		
-		when(this.alertSource.getMostRecentAlert()).thenReturn(alert, alert, alert);
-		assertEquals(0, simulateNotifier(3).getHistory().size());
+		when(this.alertSource.getMostRecentAlert()).thenReturn(alert);
+		when(this.alertSource.getSince(alert)).thenReturn(NO_UPDATES);
+
+		assertEquals(0, simulateNotifier().size());
 	}
 	
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testTzevaAdom() throws Exception
 	{
-		Alert firstAlert = createAlert("Tel Aviv");
-		Alert secondAlert = createAlert("Haifa");
+		Alert first = createAlert("Tel Aviv");
+		Alert second = createAlert("Haifa");
 		
-		when(this.alertSource.getMostRecentAlert()).thenReturn(firstAlert, firstAlert, firstAlert, firstAlert, secondAlert);
-		assertEquals(1, simulateNotifier(5).getHistory().size());
+		when(this.alertSource.getMostRecentAlert()).thenReturn(first);
+		when(this.alertSource.getSince(first)).thenReturn(NO_UPDATES, NO_UPDATES, dequeOf(second), NO_UPDATES);
+		
+		assertEquals(1, simulateNotifier().size());
 	}
 	
+	
 	@Test
+	@SuppressWarnings("unchecked")
 	public void testConsecutiveTzevaAdom() throws Exception 
 	{
-		Alert firstAlert = createAlert("Tel Aviv");
-		Alert secondAlert = createAlert("Haifa");
-		Alert thirdAlert = createAlert("Jerusalem");
+		Alert first = createAlert("Tel Aviv");
+		Alert second = createAlert("Haifa");
+		Alert third = createAlert("Jerusalem");
 		
-		when(this.alertSource.getMostRecentAlert()).thenReturn(firstAlert, secondAlert, thirdAlert, firstAlert);
-		assertEquals(3, simulateNotifier(4).getHistory().size());
+		when(this.alertSource.getMostRecentAlert()).thenReturn(first);
+		when(this.alertSource.getSince(any())).thenReturn(dequeOf(second), dequeOf(third), dequeOf(first), NO_UPDATES);
+		
+		assertEquals(3, simulateNotifier().size());
 	}
 	
 	@Test
 	@DisplayName("The usual request flow where 99% are no responses")
+	@SuppressWarnings("unchecked")
 	public void testUsualRoutine() throws Exception 
 	{
-		when(this.alertSource.getMostRecentAlert()).thenReturn(
-				AlertSource.NO_RESPONSE,
-				AlertSource.NO_RESPONSE, 
-				AlertSource.NO_RESPONSE, 
-				AlertSource.NO_RESPONSE,  
-				createAlert("Tel Aviv"));
+		Alert first = createAlert("Tel Aviv");
 		
-		assertEquals(1, simulateNotifier(5).getHistory().size());
+		when(this.alertSource.getMostRecentAlert()).thenReturn(first);
+		
+		when(this.alertSource.getSince(any())).thenReturn(
+				NO_UPDATES, 
+				NO_UPDATES, 
+				NO_UPDATES,
+				NO_UPDATES, 
+				dequeOf(first),
+				NO_UPDATES);
+		
+		assertEquals(1, simulateNotifier().size());
 	}
 	
-	private static Alert createAlert(String city) 
+	private static Alert createAlert(String region) 
 	{
-		return new Alert(city, "חדירת מחבלים", LocalDateTime.now());
+		String randomTitle = ThreadLocalRandom.current().nextBoolean() ? "חדירת מחבלים" : "חדירת כלי טיס עוין";
+		
+		return new Alert(region, randomTitle, LocalDateTime.now());
 	}
 	
 	/**
-	 * Runs a notifier that records the specified amount of dummy alerts, and then returns it.
-	 * 
-	 * @return A notifier after a simulated run.
-	 * @throws InterruptedException when the sleeping between requests fails.
+	 * Runs a new notifier based on the mocked Alert Source, and then returns its tzeva adom history.
 	 */
-	private TzevaAdomNotifier simulateNotifier(int alertsAmount) throws InterruptedException 
+	private TzevaAdomHistory simulateNotifier() throws InterruptedException 
 	{
 		TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
-				.every(Duration.ofMillis(5))
+				.requestEvery(Duration.ofMillis(5))
 				.requestFrom(this.alertSource)
 				.build();
 		
 		notifier.listen();
 		
-		//because I'm ahla gever, every alert gets 10ms to be recorded
-		Thread.sleep(Duration.ofMillis(alertsAmount * 10).toMillis());
+		//each test gets 200ms to run(or 40 alerts because of 200/the delay)
+		TimeUnit.MILLISECONDS.sleep(200);
 		
-		return notifier;
+		return notifier.getHistory();
+	}
+	
+	private static Deque<Alert> dequeOf(Alert alert)
+	{
+		Deque<Alert> deque = new LinkedList<>();
+		deque.add(alert);
+
+		return deque;
 	}
 }

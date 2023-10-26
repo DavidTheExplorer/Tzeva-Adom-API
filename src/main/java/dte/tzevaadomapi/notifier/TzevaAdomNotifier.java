@@ -3,9 +3,6 @@ package dte.tzevaadomapi.notifier;
 import java.time.Duration;
 import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
@@ -14,16 +11,10 @@ import java.util.function.Consumer;
 import dte.tzevaadomapi.alert.Alert;
 import dte.tzevaadomapi.alertsource.AlertSource;
 import dte.tzevaadomapi.alertsource.PHOAlertSource;
+import dte.tzevaadomapi.utils.UncheckedExceptions.CheckedSupplier;
 
 /**
- * Notifies registered listeners once a <b>Tzeva Adom</b> takes place.
- * <p>
- * The workflow of the notifier is:
- * <ol>
- * 	<li> Request the most recent alert sent every constant duration(typically ~2 seconds)
- * 	<li> Compare it to the previous one, or store the first result:
- * 	<li> If the 2 alerts are not identical, It's <b>Tzeva Adom</b> - and the listeners are notified immediately.
- * </ol>
+ * Notifies registered listeners immediately once a <b>Tzeva Adom</b> takes place.
  */
 public class TzevaAdomNotifier
 {
@@ -31,7 +22,10 @@ public class TzevaAdomNotifier
 	private final Duration requestDelay;
 	private final Consumer<Exception> requestFailureHandler;
 	private final Set<TzevaAdomListener> listeners = new HashSet<>();
-	private final Deque<Alert> history = new LinkedList<>();
+	private final TzevaAdomHistory history = new TzevaAdomHistory();
+	
+	//used to be a local variable in listen(), until it caused the effectively final problem
+	private Alert mostRecentAlert;
 
 	private TzevaAdomNotifier(AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler) 
 	{
@@ -39,92 +33,105 @@ public class TzevaAdomNotifier
 		this.requestDelay = requestDelay;
 		this.requestFailureHandler = requestFailureHandler;
 	}
-	
-	/**
-	 * @deprecated Pikud Ha'oref now provides Alerts by default(overridable) - Use the Builder directly.
-	 */
-	@Deprecated
-	public static Builder basedOnPikudHaoref() 
-	{
-		return new Builder()
-				.requestFrom(new PHOAlertSource());
-	}
 
 	/**
-	 * Starts listening and reacting to <b>Tzeva Adom</b> on a separate Thread, 
-	 * and returns the the corresponding {@link CompletableFuture} object for further control.
+	 * Starts an async listening to incoming alerts, and returns the corresponding {@link CompletableFuture} object for further control.
+	 * <p>
+	 * This method can be sync by calling {@code join()} on the result.
 	 * 
-	 * @return The {@link CompletableFuture} responsible of reacting to <b>Tzeva Adoms</b>.
+	 * @return The wrapping {@link CompletableFuture} object.
 	 */
 	public CompletableFuture<Void> listen()
 	{
 		return CompletableFuture.runAsync(() -> 
 		{
-			//start with an initial alert - against which future alerts will be compared
-			Alert lastTzevaAdom = getMostRecentAlert();
-
-			while(true)
+			//start with the most recent alert
+			this.mostRecentAlert = requestMostRecentAlert();
+			
+			while(true)	
 			{
-				Alert alert = getMostRecentAlert();
+				Deque<Alert> newAlerts = request(() -> this.alertSource.getSince(this.mostRecentAlert));
 				
-				//ignore empty responses
-				if(alert == AlertSource.NO_RESPONSE)
+				//if there are no new alerts - it's not Tzeva Adom
+				if(newAlerts.isEmpty()) 
 					continue;
 				
-				//if the last alert in history equals the the last requested - it's not Tzeva Adom
-				if(alert.equals(lastTzevaAdom)) 
-					continue;
+				//update the history variables
+				this.mostRecentAlert = newAlerts.getFirst();
+				this.history.update(newAlerts);
 				
-				lastTzevaAdom = alert;
-				
-				this.listeners.forEach(listener -> listener.onTzevaAdom(alert));
-				this.history.add(alert);
+				//notify Tzeva Adom
+				newAlerts.forEach(this::notifyListeners);
 			}
 		});
 	}
-
+	
+	/**
+	 * Adds a listener to notify when it's Tzeva Adom.
+	 * 
+	 * @param listener The listener.
+	 */
 	public void addListener(TzevaAdomListener listener) 
 	{
 		this.listeners.add(listener);
 	}
-
-	public Alert getLastAlert()
+	
+	/**
+	 * Returns the Tzeva Adom history since {@link #listen()} was called for this notifier.
+	 * 
+	 * @return The tzeva adom history.
+	 */
+	public TzevaAdomHistory getHistory()
 	{
-		return this.history.peekLast();
+		return this.history;
+	}
+	
+	private Alert requestMostRecentAlert() 
+	{
+		Alert alert;
+		
+		//wait until Hamas decides to launch rockets
+		do 
+		{
+			alert = request(this.alertSource::getMostRecentAlert);
+		}
+		while(alert == AlertSource.NO_RESULT);
+		
+		return alert;
 	}
 
-	public Set<Alert> getHistory()
-	{
-		return new LinkedHashSet<>(this.history);
-	}
-
-	private Alert getMostRecentAlert()
+	private <R> R request(CheckedSupplier<R> resultFactory)
 	{
 		while(true)
 		{
-			try
+			try 
 			{
+				//sleep a reasonable amount of time
 				TimeUnit.MILLISECONDS.sleep(this.requestDelay.toMillis());
 				
-				return this.alertSource.getMostRecentAlert();
+				return resultFactory.get();
 			}
-			catch(Exception exception)
+			catch(Exception exception) 
 			{
+				//pass the exception to the handler
 				this.requestFailureHandler.accept(exception);
 			}
 		}
+	}
+	
+	private void notifyListeners(Alert alert)
+	{
+		this.listeners.forEach(listener -> listener.onTzevaAdom(alert));
 	}
 
 
 
 	public static class Builder
 	{
-		private AlertSource alertSource = PIKUD_HAOREF;
-		private Duration requestDelay;
+		private AlertSource alertSource = new PHOAlertSource(); //obviously Pikud Ha'oref is the default source
+		private Duration requestDelay = Duration.ofMillis(500); //half a second is a reasonable delay
 		private Consumer<Exception> requestFailureHandler = (exception) -> {};
 		private Set<TzevaAdomListener> listeners = new HashSet<>();
-		
-		private static final AlertSource PIKUD_HAOREF = new PHOAlertSource();
 
 		public Builder requestFrom(AlertSource alertSource) 
 		{
@@ -132,34 +139,31 @@ public class TzevaAdomNotifier
 			return this;
 		}
 
-		public Builder every(Duration requestDelay) 
+		public Builder requestEvery(Duration requestDelay) 
 		{
 			this.requestDelay = requestDelay;
 			return this;
 		}
-		
+
 		public Builder onFailedRequest(Consumer<Exception> handler) 
 		{
 			this.requestFailureHandler = handler;
 			return this;
 		}
-		
+
 		public Builder onTzevaAdom(TzevaAdomListener listener)
 		{
 			this.listeners.add(listener);
 			return this;
 		}
-		
+
 		public CompletableFuture<Void> listen()
 		{
 			return build().listen();
 		}
-		
+
 		public TzevaAdomNotifier build()
 		{
-			Objects.requireNonNull(this.alertSource, "The source of the alerts must be provided!");
-			Objects.requireNonNull(this.requestDelay, "The delay between requesting alerts must be provided!");
-			
 			TzevaAdomNotifier notifier = new TzevaAdomNotifier(this.alertSource, this.requestDelay, this.requestFailureHandler);
 			this.listeners.forEach(notifier::addListener);
 

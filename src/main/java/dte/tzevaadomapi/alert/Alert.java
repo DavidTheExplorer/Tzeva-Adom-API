@@ -1,34 +1,53 @@
 package dte.tzevaadomapi.alert;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
- * Represents a <b>Tzeva Adom</b> alert and contains information about where/when it happened.
+ * Represents a <b>Tzeva Adom</b> and provides information about it.
  */
 public class Alert
 {
-	private final String city;
+	private final String region;
 	private final String title;
 	private final LocalDateTime date;
 	
-	public Alert(String city, String title, LocalDateTime date) 
+	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+	
+	public Alert(String region, String title, LocalDateTime date) 
 	{
-		this.city = city;
+		this.region = region;
 		this.title = title;
 		this.date = date;
 	}
 	
-	public String getCity() 
+	/**
+	 * Returns the region where this alert happened.
+	 * 
+	 * @return This alert's region.
+	 */
+	public String getRegion() 
 	{
-		return this.city;
+		return this.region;
 	}
 	
+	/**
+	 * Describes the cause of this alert - what happened that had caused it to happen.
+	 * 
+	 * @return This alert's description.
+	 */
 	public String getTitle() 
 	{
 		return this.title;
 	}
 	
+	/**
+	 * Returns when this alert happened.
+	 * 
+	 * @return This alert's date.
+	 */
 	public LocalDateTime getDate() 
 	{
 		return this.date;
@@ -37,7 +56,7 @@ public class Alert
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(this.city, this.title, this.date);
+		return Objects.hash(this.region, this.title, this.date);
 	}
 	
 	@Override
@@ -51,7 +70,7 @@ public class Alert
 		
 		Alert other = (Alert) object;
 		
-		return Objects.equals(this.city, other.city) && 
+		return Objects.equals(this.region, other.region) && 
 				Objects.equals(this.title, other.title) &&
 				Objects.equals(this.date, other.date);
 	}
@@ -59,6 +78,6 @@ public class Alert
 	@Override
 	public String toString()
 	{
-		return String.format("Alert [city=%s, title=%s, date=%s]", this.city, this.title, this.date);
+		return String.format("Alert [region=%s, title=%s, date=%s]", this.region, this.title, this.date.format(DATE_FORMATTER));
 	}
 }
