@@ -1,6 +1,8 @@
 package dte.tzevaadomapi.alert;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 import java.util.Objects;
 
 /**
@@ -11,6 +13,8 @@ public class Alert
 	private final String city;
 	private final String title;
 	private final LocalDateTime date;
+	
+	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
 	
 	public Alert(String city, String title, LocalDateTime date) 
 	{
@@ -74,6 +78,6 @@ public class Alert
 	@Override
 	public String toString()
 	{
-		return String.format("Alert [city=%s, title=%s, date=%s]", this.city, this.title, this.date);
+		return String.format("Alert [city=%s, title=%s, date=%s]", this.city, this.title, this.date.format(DATE_FORMATTER));
 	}
 }
