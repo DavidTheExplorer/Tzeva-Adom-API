@@ -107,7 +107,7 @@ public class TzevaAdomNotifierTest
 				.requestFrom(this.alertSource)
 				.build();
 		
-		notifier.listen();
+		notifier.listenAsync();
 		
 		//each test gets 200ms to run(or 40 alerts because of 200/the delay)
 		TimeUnit.MILLISECONDS.sleep(200);

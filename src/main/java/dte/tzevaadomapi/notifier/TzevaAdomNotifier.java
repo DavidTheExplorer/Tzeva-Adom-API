@@ -35,13 +35,13 @@ public class TzevaAdomNotifier
 	}
 
 	/**
-	 * Starts an async listening to incoming alerts, and returns the corresponding {@link CompletableFuture} object for further control.
+	 * Starts listening to incoming alerts, and returns the corresponding {@link CompletableFuture} object for further control.
 	 * <p>
-	 * This method can be sync by calling {@code join()} on the result.
+	 * In order to implement a program whose sole workflow is to be idle until there is an alert, call {@link CompletableFuture#join() join()} on the result.
 	 * 
 	 * @return The wrapping {@link CompletableFuture} object.
 	 */
-	public CompletableFuture<Void> listen()
+	public CompletableFuture<Void> listenAsync()
 	{
 		return CompletableFuture.runAsync(() -> 
 		{
@@ -157,9 +157,9 @@ public class TzevaAdomNotifier
 			return this;
 		}
 
-		public CompletableFuture<Void> listen()
+		public CompletableFuture<Void> listenAsync()
 		{
-			return build().listen();
+			return build().listenAsync();
 		}
 
 		public TzevaAdomNotifier build()
