@@ -23,9 +23,7 @@ public class TzevaAdomNotifier
 	private final Consumer<Exception> requestFailureHandler;
 	private final Set<TzevaAdomListener> listeners = new HashSet<>();
 	private final TzevaAdomHistory history = new TzevaAdomHistory();
-	
-	//used to be a local variable in listen(), until it caused the effectively final problem
-	private Alert mostRecentAlert;
+	private Alert mostRecentAlert; //only used in listen(), holding it here solves the effectively final problem
 
 	private TzevaAdomNotifier(AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler) 
 	{

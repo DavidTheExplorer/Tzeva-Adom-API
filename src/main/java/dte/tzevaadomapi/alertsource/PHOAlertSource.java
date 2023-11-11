@@ -39,21 +39,21 @@ public class PHOAlertSource implements AlertSource
 	public Alert getMostRecentAlert() throws Exception
 	{
 		//read the first alert in the list
-		return readJsonArray(reader -> GSON.fromJson(reader, Alert.class));
+		return beginReadingArray(reader -> GSON.fromJson(reader, Alert.class));
 	}
 	
 	@Override
 	public Deque<Alert> getSince(Alert alert) throws Exception
 	{
-		return readJsonArray(reader -> 
+		return beginReadingArray(reader -> 
 		{
 			Deque<Alert> result = new LinkedList<>();
 
 			while(reader.hasNext()) 
 			{
 				Alert nextAlert = GSON.fromJson(reader, Alert.class);
-
-				//efficiency - stop when the provided alert is encountered
+				
+				//stop when the provided alert is reached
 				if(nextAlert.equals(alert)) 
 					break;
 
@@ -65,7 +65,7 @@ public class PHOAlertSource implements AlertSource
 	}
 	
 	//starts reading the JSON list posted by Pikud Ha'oref, and applies the function on it
-	private <T> T readJsonArray(CheckedFunction<JsonReader, T> resultParser) 
+	private <T> T beginReadingArray(CheckedFunction<JsonReader, T> resultParser) 
 	{
 		try(JsonReader reader = new JsonReader(new InputStreamReader(REQUEST_URL.openStream(), UTF_8)))
 		{
