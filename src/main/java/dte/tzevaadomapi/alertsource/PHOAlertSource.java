@@ -4,6 +4,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
+import java.net.Proxy;
 import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -29,11 +30,33 @@ import dte.tzevaadomapi.utils.UncheckedExceptions.CheckedFunction;
  */
 public class PHOAlertSource implements AlertSource
 {
+	private final Proxy proxy;
+	
 	private static final URL REQUEST_URL = URLFactory.of("https://www.oref.org.il/WarningMessages/History/AlertsHistory.json");
 	
 	private static final Gson GSON = new GsonBuilder()
 			.registerTypeAdapter(Alert.class, new AlertDeserializer())
 			.create();
+	
+	/**
+	 * Creates a source based on Pikud Ha'oref, without any proxy involved.
+	 */
+	public PHOAlertSource() 
+	{
+		this(Proxy.NO_PROXY);
+	}
+	
+	/**
+	 * Creates a source based on Pikud Ha'oref that uses the provided {@code proxy} to connect. 
+	 * <p>
+	 * * Use this constructor when the library is used <i>outside</i> of Israel.
+	 * 
+	 * @param proxy The proxy to use when connecting.
+	 */
+	public PHOAlertSource(Proxy proxy) 
+	{
+		this.proxy = proxy;
+	}
 	
 	@Override
 	public Alert getMostRecentAlert() throws Exception
@@ -67,7 +90,7 @@ public class PHOAlertSource implements AlertSource
 	//starts reading the JSON list posted by Pikud Ha'oref, and applies the function on it
 	private <T> T beginReadingArray(CheckedFunction<JsonReader, T> resultParser) 
 	{
-		try(JsonReader reader = new JsonReader(new InputStreamReader(REQUEST_URL.openStream(), UTF_8)))
+		try(JsonReader reader = new JsonReader(new InputStreamReader(REQUEST_URL.openConnection(this.proxy).getInputStream(), UTF_8)))
 		{
 			reader.beginArray();
 
