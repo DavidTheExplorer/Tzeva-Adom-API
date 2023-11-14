@@ -14,7 +14,7 @@ public class Alert
 	private final String title;
 	private final LocalDateTime date;
 	
-	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
 	
 	public Alert(String region, String title, LocalDateTime date) 
 	{
