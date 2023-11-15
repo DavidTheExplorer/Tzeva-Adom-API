@@ -1,8 +1,5 @@
 package dte.tzevaadomapi.alertsource;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-
-import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.Proxy;
 import java.net.URL;
@@ -28,10 +25,8 @@ import dte.tzevaadomapi.utils.UncheckedExceptions.CheckedFunction;
 /**
  * Requests Alerts from the the website of Pikud Ha Oref.
  */
-public class PHOAlertSource implements AlertSource
+public class PHOAlertSource extends OnlineAlertSource
 {
-	private final Proxy proxy;
-	
 	private static final URL REQUEST_URL = URLFactory.of("https://www.oref.org.il/WarningMessages/History/AlertsHistory.json");
 	
 	private static final Gson GSON = new GsonBuilder()
@@ -43,7 +38,7 @@ public class PHOAlertSource implements AlertSource
 	 */
 	public PHOAlertSource() 
 	{
-		this(Proxy.NO_PROXY);
+		super(REQUEST_URL);
 	}
 	
 	/**
@@ -55,7 +50,7 @@ public class PHOAlertSource implements AlertSource
 	 */
 	public PHOAlertSource(Proxy proxy) 
 	{
-		this.proxy = proxy;
+		super(REQUEST_URL, proxy);
 	}
 	
 	@Override
@@ -90,7 +85,7 @@ public class PHOAlertSource implements AlertSource
 	//starts reading the JSON list posted by Pikud Ha'oref, and applies the function on it
 	private <T> T beginReadingArray(CheckedFunction<JsonReader, T> resultParser) 
 	{
-		try(JsonReader reader = new JsonReader(new InputStreamReader(REQUEST_URL.openConnection(this.proxy).getInputStream(), UTF_8)))
+		try(JsonReader reader = new JsonReader(newInputStreamReader()))
 		{
 			reader.beginArray();
 
