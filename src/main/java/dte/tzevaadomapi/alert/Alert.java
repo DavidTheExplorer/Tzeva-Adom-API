@@ -5,13 +5,20 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Objects;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Represents a <b>Tzeva Adom</b> and provides information about it.
  */
 public class Alert
 {
+	@SerializedName("data")
 	private final String region;
+	
+	@SerializedName("title")
 	private final String title;
+	
+	@SerializedName("alertDate")
 	private final LocalDateTime date;
 	
 	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
