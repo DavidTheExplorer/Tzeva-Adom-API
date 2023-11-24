@@ -94,7 +94,7 @@ public class TzevaAdomNotifierTest
 	{
 		String randomTitle = ThreadLocalRandom.current().nextBoolean() ? "חדירת מחבלים" : "חדירת כלי טיס עוין";
 		
-		return new Alert(region, randomTitle, LocalDateTime.now());
+		return new Alert(region, randomTitle, 1, LocalDateTime.now());
 	}
 	
 	/**
@@ -107,7 +107,7 @@ public class TzevaAdomNotifierTest
 				.requestFrom(this.alertSource)
 				.build();
 		
-		notifier.listen();
+		notifier.listenAsync();
 		
 		//each test gets 200ms to run(or 40 alerts because of 200/the delay)
 		TimeUnit.MILLISECONDS.sleep(200);

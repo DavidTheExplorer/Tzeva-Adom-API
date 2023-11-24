@@ -5,21 +5,32 @@ import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 import java.util.Objects;
 
+import com.google.gson.annotations.SerializedName;
+
 /**
  * Represents a <b>Tzeva Adom</b> and provides information about it.
  */
 public class Alert
 {
+	@SerializedName("data")
 	private final String region;
+	
+	@SerializedName("title")
 	private final String title;
+	
+	@SerializedName("category")
+	private final int category;
+	
+	@SerializedName("alertDate")
 	private final LocalDateTime date;
 	
-	private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
+	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
 	
-	public Alert(String region, String title, LocalDateTime date) 
+	public Alert(String region, String title, int category, LocalDateTime date) 
 	{
 		this.region = region;
 		this.title = title;
+		this.category = category;
 		this.date = date;
 	}
 	
@@ -41,6 +52,16 @@ public class Alert
 	public String getTitle() 
 	{
 		return this.title;
+	}
+	
+	/**
+	 * Returns the category of this alert.
+	 * 
+	 * @return This alert's category.
+	 */
+	public int getCategory()
+	{
+		return this.category;
 	}
 	
 	/**
@@ -72,12 +93,13 @@ public class Alert
 		
 		return Objects.equals(this.region, other.region) && 
 				Objects.equals(this.title, other.title) &&
+				Objects.equals(this.category, other.category) &&
 				Objects.equals(this.date, other.date);
 	}
 	
 	@Override
 	public String toString()
 	{
-		return String.format("Alert [region=%s, title=%s, date=%s]", this.region, this.title, this.date.format(DATE_FORMATTER));
+		return String.format("Alert [region=%s, title=%s, category=%d, date=%s]", this.region, this.title, this.category, this.date.format(DATE_FORMATTER));
 	}
 }

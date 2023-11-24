@@ -11,6 +11,7 @@ import java.util.function.Consumer;
 import dte.tzevaadomapi.alert.Alert;
 import dte.tzevaadomapi.alertsource.AlertSource;
 import dte.tzevaadomapi.alertsource.PHOAlertSource;
+import dte.tzevaadomapi.listener.TzevaAdomListener;
 import dte.tzevaadomapi.utils.UncheckedExceptions.CheckedSupplier;
 
 /**
@@ -23,9 +24,7 @@ public class TzevaAdomNotifier
 	private final Consumer<Exception> requestFailureHandler;
 	private final Set<TzevaAdomListener> listeners = new HashSet<>();
 	private final TzevaAdomHistory history = new TzevaAdomHistory();
-	
-	//used to be a local variable in listen(), until it caused the effectively final problem
-	private Alert mostRecentAlert;
+	private Alert mostRecentAlert; //only used in listen(), holding it here solves the effectively final problem
 
 	private TzevaAdomNotifier(AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler) 
 	{
@@ -35,13 +34,13 @@ public class TzevaAdomNotifier
 	}
 
 	/**
-	 * Starts an async listening to incoming alerts, and returns the corresponding {@link CompletableFuture} object for further control.
+	 * Starts listening to incoming alerts, and returns the corresponding {@link CompletableFuture} object for further control.
 	 * <p>
-	 * This method can be sync by calling {@code join()} on the result.
+	 * In order to implement a program whose sole workflow is to be idle until there is an alert, call {@link CompletableFuture#join() join()} on the result.
 	 * 
 	 * @return The wrapping {@link CompletableFuture} object.
 	 */
-	public CompletableFuture<Void> listen()
+	public CompletableFuture<Void> listenAsync()
 	{
 		return CompletableFuture.runAsync(() -> 
 		{
@@ -157,9 +156,9 @@ public class TzevaAdomNotifier
 			return this;
 		}
 
-		public CompletableFuture<Void> listen()
+		public CompletableFuture<Void> listenAsync()
 		{
-			return build().listen();
+			return build().listenAsync();
 		}
 
 		public TzevaAdomNotifier build()
