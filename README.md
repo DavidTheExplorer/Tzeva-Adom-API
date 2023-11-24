@@ -1,5 +1,5 @@
 # Tzeva Adom API
-Async Java API that listens to `Pikud Ha'oref` and notifies registered listeners as soon as a Tzeva Adom happens.\
+Java API that communicates with `Pikud Ha'oref` and notifies registered listeners as soon as a Tzeva Adom happens.\
 Integrating it in projects(games, etc) used by many israelis, **increases** the chances of saving lives.
 
 ## How to use
@@ -16,12 +16,12 @@ TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
         })
         .build();
 	
-notifier.listen(); //async
+notifier.listenAsync();
 ```
 \
 By saving the notifier object, you can gather information while your program is running:
 ```java
-notifier.listen(); //async - anything else is sync
+notifier.listenAsync();
 
 //sleep for a day
 TimeUnit.DAYS.sleep(1);
@@ -29,10 +29,10 @@ TimeUnit.DAYS.sleep(1);
 //print all the alerts from the last day
 for(Alert alert : notifier.getHistory()) 
 {
-        LOGGER.warn("Alert at {} was in {}", alert.getCity(), alert.getDate());
+        LOGGER.warn("Alert at {} was in {}", alert.getRegion(), alert.getDate());
 }
 
-//check a specific city's alerts
+//check a specific region's alerts
 List<Alert> telAvivAlerts = notifier.getHistory().ofRegion("תל אביב");
 ```
 
@@ -49,7 +49,7 @@ Maven Repository:
 <dependency>
         <groupId>com.github.DavidTheExplorer</groupId>
         <artifactId>Tzeva-Adom-API</artifactId>
-        <version>1.5.0</version>
+        <version>1.6.0</version>
 </dependency>
 ```
 
