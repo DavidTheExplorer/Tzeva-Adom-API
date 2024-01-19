@@ -8,7 +8,7 @@ Let's create a notifier that is responsible of stopping your addicting game:
 Game game = ...;
 
 TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
-        .onFailedRequest(exception -> LOGGER.error("Failed to request the last alert from Pikud Ha'oref", exception))
+        .onFailedRequest(exception -> LOGGER.error("Failed to request the latest alert", exception))
         .onTzevaAdom(alert ->
         {
                 game.stop();
