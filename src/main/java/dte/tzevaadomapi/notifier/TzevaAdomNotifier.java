@@ -5,6 +5,8 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -62,7 +64,7 @@ public class TzevaAdomNotifier
 				//notify Tzeva Adom
 				newAlerts.forEach(this::notifyListeners);
 			}
-		});
+		}, Executors.newSingleThreadExecutor(runnable -> new Thread(runnable, "Tzeva-Adom-Notifier")));
 	}
 	
 	/**
