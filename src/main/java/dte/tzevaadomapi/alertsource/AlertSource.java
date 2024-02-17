@@ -5,7 +5,7 @@ import java.util.Deque;
 import dte.tzevaadomapi.alert.Alert;
 
 /**
- * Responsible of providing information about Tzeva Adoms in Israel. The info comes in form of {@link Alert} objects.
+ * Provides information about Tzeva Adoms in Israel, in form of {@link Alert} objects.
  */
 public interface AlertSource
 {

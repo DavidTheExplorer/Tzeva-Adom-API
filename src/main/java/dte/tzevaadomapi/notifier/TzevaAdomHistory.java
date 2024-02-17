@@ -16,21 +16,11 @@ public class TzevaAdomHistory implements Iterable<Alert>
 	private final Deque<Alert> history = new LinkedList<>();
 	
 	/**
-	 * Records a new alert.
-	 * 
-	 * @param alert The alert.
-	 */
-	public void update(Alert alert) 
-	{
-		this.history.add(alert);
-	}
-	
-	/**
 	 * Records a collection of alerts.
 	 * 
 	 * @param alerts The alerts.
 	 */
-	public void update(Collection<Alert> alerts)
+	void update(Collection<Alert> alerts)
 	{
 		this.history.addAll(alerts);
 	}

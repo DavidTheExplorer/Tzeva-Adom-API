@@ -9,9 +9,9 @@ import java.net.URL;
 import java.net.URLConnection;
 
 /**
- * Represents a source that requires internet connection in order to access. 
+ * Represents a source that requires internet connection in order to access.
  * <p>
- * This class holds the essential connection details(the url, a possible proxy, etc) and provides convenient connection methods.
+ * This class takes care of the essential connection details(the url, a possible proxy) and provides convenient connection methods.
  */
 public abstract class OnlineAlertSource implements AlertSource
 {

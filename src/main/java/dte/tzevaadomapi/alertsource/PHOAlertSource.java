@@ -20,7 +20,7 @@ import dte.tzevaadomapi.utils.URLFactory;
 import dte.tzevaadomapi.utils.UncheckedExceptions.CheckedFunction;
 
 /**
- * Requests Alerts from the the website of Pikud Ha Oref.
+ * Requests Alerts from Pikud Ha'Oref.
  */
 public class PHOAlertSource extends OnlineAlertSource
 {

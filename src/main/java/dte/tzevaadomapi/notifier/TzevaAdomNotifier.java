@@ -5,6 +5,8 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
@@ -24,7 +26,7 @@ public class TzevaAdomNotifier
 	private final Consumer<Exception> requestFailureHandler;
 	private final Set<TzevaAdomListener> listeners = new HashSet<>();
 	private final TzevaAdomHistory history = new TzevaAdomHistory();
-	private Alert mostRecentAlert; //only used in listen(), holding it here solves the effectively final problem
+	private Alert mostRecentAlert; //only used in listenAsync(), holding it here solves the effectively final problem
 
 	private TzevaAdomNotifier(AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler) 
 	{
@@ -49,7 +51,7 @@ public class TzevaAdomNotifier
 			
 			while(true)	
 			{
-				Deque<Alert> newAlerts = request(() -> this.alertSource.getSince(this.mostRecentAlert));
+				Deque<Alert> newAlerts = requestFromSource(() -> this.alertSource.getSince(this.mostRecentAlert));
 				
 				//if there are no new alerts - it's not Tzeva Adom
 				if(newAlerts.isEmpty()) 
@@ -62,7 +64,7 @@ public class TzevaAdomNotifier
 				//notify Tzeva Adom
 				newAlerts.forEach(this::notifyListeners);
 			}
-		});
+		}, Executors.newSingleThreadExecutor(runnable -> new Thread(runnable, "Tzeva-Adom-Notifier")));
 	}
 	
 	/**
@@ -76,7 +78,7 @@ public class TzevaAdomNotifier
 	}
 	
 	/**
-	 * Returns the Tzeva Adom history since {@link #listen()} was called for this notifier.
+	 * Returns the captured history since {@link #listenAsync()} was called.
 	 * 
 	 * @return The tzeva adom history.
 	 */
@@ -92,27 +94,27 @@ public class TzevaAdomNotifier
 		//wait until Hamas decides to launch rockets
 		do 
 		{
-			alert = request(this.alertSource::getMostRecentAlert);
+			alert = requestFromSource(this.alertSource::getMostRecentAlert);
 		}
 		while(alert == AlertSource.NO_RESULT);
 		
 		return alert;
 	}
 
-	private <R> R request(CheckedSupplier<R> resultFactory)
+	private <T> T requestFromSource(CheckedSupplier<T> resultFactory)
 	{
 		while(true)
 		{
 			try 
 			{
-				//sleep a reasonable amount of time
+				//sleep the defined delay
 				TimeUnit.MILLISECONDS.sleep(this.requestDelay.toMillis());
 				
 				return resultFactory.get();
 			}
 			catch(Exception exception) 
 			{
-				//pass the exception to the handler
+				//handle the exception and request again
 				this.requestFailureHandler.accept(exception);
 			}
 		}
