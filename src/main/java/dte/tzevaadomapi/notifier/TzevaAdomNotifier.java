@@ -158,9 +158,12 @@ public class TzevaAdomNotifier
 			return this;
 		}
 
-		public CompletableFuture<Void> listenAsync()
+		public TzevaAdomNotifier listenAsync()
 		{
-			return build().listenAsync();
+			TzevaAdomNotifier notifier = build();
+			notifier.listenAsync();
+
+			return notifier;
 		}
 
 		public TzevaAdomNotifier build()

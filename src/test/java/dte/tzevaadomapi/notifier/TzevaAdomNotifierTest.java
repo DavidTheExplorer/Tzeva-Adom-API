@@ -56,7 +56,6 @@ public class TzevaAdomNotifierTest
 		assertEquals(1, simulateNotifier().size());
 	}
 	
-	
 	@Test
 	@SuppressWarnings("unchecked")
 	public void testConsecutiveTzevaAdom() throws Exception 
@@ -108,9 +107,7 @@ public class TzevaAdomNotifierTest
 				.requestFrom(this.alertSource)
 				.onFailedRequest(Assertions::fail)
 				.onTzevaAdom(alert -> {})
-				.build();
-		
-		notifier.listenAsync();
+				.listenAsync();
 		
 		//each test gets 200ms to run(or 40 alerts because of 200/the delay)
 		TimeUnit.MILLISECONDS.sleep(200);
