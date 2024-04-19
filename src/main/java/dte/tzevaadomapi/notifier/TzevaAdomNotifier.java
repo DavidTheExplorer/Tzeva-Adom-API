@@ -1,9 +1,9 @@
 package dte.tzevaadomapi.notifier;
 
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Deque;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
@@ -23,12 +23,13 @@ public class TzevaAdomNotifier
 	private final AlertSource alertSource;
 	private final Duration requestDelay;
 	private final Consumer<Exception> requestFailureHandler;
-	private final Set<TzevaAdomListener> listeners = new HashSet<>();
+	private final Collection<TzevaAdomListener> listeners;
 	private final TzevaAdomHistory history = new TzevaAdomHistory();
 	private Alert mostRecentAlert; //only used in listenAsync(), holding it here solves the effectively final problem
 
-	private TzevaAdomNotifier(AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler) 
+	private TzevaAdomNotifier(Collection<TzevaAdomListener> listeners, AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler)
 	{
+		this.listeners = listeners;
 		this.alertSource = alertSource;
 		this.requestDelay = requestDelay;
 		this.requestFailureHandler = requestFailureHandler;
@@ -128,9 +129,9 @@ public class TzevaAdomNotifier
 
 	public static class Builder
 	{
+		private Collection<TzevaAdomListener> listeners = new ArrayList<>();
 		private AlertSource alertSource = new PHOAlertSource(); //obviously Pikud Ha'oref is the default source
 		private Duration requestDelay = Duration.ofMillis(500); //half a second is a reasonable delay
-		private Set<TzevaAdomListener> listeners = new HashSet<>();
 		private Consumer<Exception> requestFailureHandler;
 
 		public Builder requestFrom(AlertSource alertSource) 
@@ -170,10 +171,7 @@ public class TzevaAdomNotifier
 			if(this.listeners.isEmpty())
 				throw new IllegalStateException("At least one listener must be provided to create a TzevaAdomNotifier.");
 
-			TzevaAdomNotifier notifier = new TzevaAdomNotifier(this.alertSource, this.requestDelay, this.requestFailureHandler);
-			this.listeners.forEach(notifier::addListener);
-
-			return notifier;
+			return new TzevaAdomNotifier(this.listeners, this.alertSource, this.requestDelay, this.requestFailureHandler);
 		}
 	}
 }
