@@ -5,7 +5,6 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
@@ -131,8 +130,8 @@ public class TzevaAdomNotifier
 	{
 		private AlertSource alertSource = new PHOAlertSource(); //obviously Pikud Ha'oref is the default source
 		private Duration requestDelay = Duration.ofMillis(500); //half a second is a reasonable delay
-		private Consumer<Exception> requestFailureHandler = (exception) -> {};
 		private Set<TzevaAdomListener> listeners = new HashSet<>();
+		private Consumer<Exception> requestFailureHandler;
 
 		public Builder requestFrom(AlertSource alertSource) 
 		{
@@ -165,6 +164,12 @@ public class TzevaAdomNotifier
 
 		public TzevaAdomNotifier build()
 		{
+			if(this.requestFailureHandler == null)
+				throw new IllegalStateException("A request failure handler must be provided to create a TzevaAdomNotifier.");
+
+			if(this.listeners.isEmpty())
+				throw new IllegalStateException("At least one listener must be provided to create a TzevaAdomNotifier.");
+
 			TzevaAdomNotifier notifier = new TzevaAdomNotifier(this.alertSource, this.requestDelay, this.requestFailureHandler);
 			this.listeners.forEach(notifier::addListener);
 
