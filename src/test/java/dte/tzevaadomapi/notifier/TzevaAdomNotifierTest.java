@@ -11,6 +11,7 @@ import java.util.LinkedList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
@@ -105,6 +106,8 @@ public class TzevaAdomNotifierTest
 		TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
 				.requestEvery(Duration.ofMillis(5))
 				.requestFrom(this.alertSource)
+				.onFailedRequest(Assertions::fail)
+				.onTzevaAdom(alert -> {})
 				.build();
 		
 		notifier.listenAsync();
