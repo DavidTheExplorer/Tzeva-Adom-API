@@ -90,7 +90,7 @@ public class PHOAlertSource extends OnlineAlertSource
 		}
 		catch(Exception exception) 
 		{
-			throw new RuntimeException(String.format("Could not contact Pikud Ha'oref due to %s", exception));
+			throw new RuntimeException("Could not contact Pikud Ha'oref", exception);
 		}
 	}
 	
