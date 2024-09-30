@@ -24,7 +24,7 @@ import dte.tzevaadomapi.utils.UncheckedExceptions.CheckedFunction;
  */
 public class PHOAlertSource extends OnlineAlertSource
 {
-	private static final URL REQUEST_URL = URLFactory.of("https://www.oref.org.il/WarningMessages/History/AlertsHistory.json");
+	private static final URL REQUEST_URL = URLFactory.of("https://www.oref.org.il/warningMessages/alert/History/AlertsHistory.json");
 	
 	private static final Gson GSON = new GsonBuilder()
 			.registerTypeAdapter(LocalDateTime.class, new LocalDateTimeDeserializer())
@@ -90,7 +90,7 @@ public class PHOAlertSource extends OnlineAlertSource
 		}
 		catch(Exception exception) 
 		{
-			throw new RuntimeException(String.format("Could not contact Pikud Ha'oref due to %s", exception));
+			throw new RuntimeException("Could not contact Pikud Ha'oref", exception);
 		}
 	}
 	

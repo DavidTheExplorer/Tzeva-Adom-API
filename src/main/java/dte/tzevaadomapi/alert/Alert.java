@@ -77,7 +77,7 @@ public class Alert
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(this.region, this.title, this.date);
+		return Objects.hash(this.region, this.title, this.category, this.date);
 	}
 	
 	@Override
