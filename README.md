@@ -1,26 +1,31 @@
 # Tzeva Adom API
-Java API that communicates with `Pikud Ha'oref` and notifies registered listeners as soon as a Tzeva Adom happens.\
-Integrating it in projects(games, etc) used by many israelis, **increases** the chances of saving lives.
+Java library that communicates with `Pikud Ha'oref` and notifies registered listeners as soon as a Tzeva Adom happens.\
+Integrating it in projects(games, etc) used by many israelis, **increases** the chances of saving someone's life.
 
 ## How to use
-Let's create a notifier that is responsible of stopping your addicting game:
+How to stop your addicting game on Tzeva Adom:
 ```java
 Game game = ...;
 
 TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
-        .onFailedRequest(exception -> LOGGER.error("Failed to request the latest alert", exception))
+        .onFailedRequest(exception -> LOGGER.error("Failed to request the latest alert from Pikud Haoref", exception))
         .onTzevaAdom(alert ->
         {
                 game.stop();
-                game.sendMessage("There is a Tzeva Adom in: " + alert.getRegion());
+                game.displayMessage("There is a Tzeva Adom in: " + alert.getRegion());
         })
         .build();
-	
+
+//this returns a CompletableFuture - so you can join() if your program needs to stay silent until a Tzeva Adom happens
 notifier.listenAsync();
 ```
 \
-By saving the notifier object, you can gather information while your program is running:
+By saving the notifier object, you can receive the captured alert history:
 ```java
+import java.util.concurrent.TimeUnit;
+import dte.tzevaadomapi.alert.Alert;
+
+...
 notifier.listenAsync();
 
 //sleep for a day
@@ -49,21 +54,23 @@ Maven Repository:
 <dependency>
         <groupId>com.github.DavidTheExplorer</groupId>
         <artifactId>Tzeva-Adom-API</artifactId>
-        <version>1.6.0</version>
+        <version>1.7.1</version>
 </dependency>
 ```
 
 
-## Builder Options
+## Adjustments
 Everything in the library is customizable.
 -  If the endpoint of Pikud Ha'oref was changed or your alerts come from somewhere else:\
    Implement `AlertSource` and then create your notifier like this:
+   
    ```java
    new TzevaAdomNotifier.Builder()
-   .requestFrom(new YourAlertSource())
+   	.requestFrom(new YourAlertSource())
    ```
-- If you want to lower the frequency of the Tzeva Adom checks, create your notifier like this:
+- Override the frequency of the Tzeva Adom checks:
+ 
   ```java
   new TzevaAdomNotifier.Builder()
-  .requestEvery(Duration.ofSeconds(3))
+  	.requestEvery(Duration.ofSeconds(3))
   ```
