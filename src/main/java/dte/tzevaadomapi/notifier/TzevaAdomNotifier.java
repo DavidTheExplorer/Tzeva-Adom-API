@@ -12,6 +12,7 @@ import java.util.function.Consumer;
 import dte.tzevaadomapi.alert.Alert;
 import dte.tzevaadomapi.alertsource.AlertSource;
 import dte.tzevaadomapi.alertsource.PHOAlertSource;
+import dte.tzevaadomapi.exceptionhandler.LimitedExceptionHandler;
 import dte.tzevaadomapi.listener.TzevaAdomListener;
 import dte.tzevaadomapi.utils.UncheckedExceptions.CheckedSupplier;
 
@@ -146,6 +147,14 @@ public class TzevaAdomNotifier
 			return this;
 		}
 
+		/**
+		 * Determines how to handle exceptions when alerts are fetched.
+		 *
+		 * @apiNote To prevent unwanted behaviour such as logging the same IOException when the server is offline, You can pass a {@link LimitedExceptionHandler}.
+		 *
+		 * @param handler The exception handler.
+		 * @return The same instance.
+		 */
 		public Builder onFailedRequest(Consumer<Exception> handler) 
 		{
 			this.requestFailureHandler = handler;
@@ -173,6 +182,10 @@ public class TzevaAdomNotifier
 
 			if(this.listeners.isEmpty())
 				throw new IllegalStateException("At least one listener must be provided to create a TzevaAdomNotifier.");
+
+			//support for LimitedExceptionHandler
+			if(this.requestFailureHandler instanceof TzevaAdomListener)
+				this.listeners.add((TzevaAdomListener) this.requestFailureHandler);
 
 			return new TzevaAdomNotifier(this.listeners, this.alertSource, this.requestDelay, this.requestFailureHandler);
 		}
