@@ -17,7 +17,7 @@ import com.google.gson.stream.JsonReader;
 
 import dte.tzevaadomapi.alert.Alert;
 import dte.tzevaadomapi.utils.URLFactory;
-import dte.tzevaadomapi.utils.UncheckedExceptions.CheckedFunction;
+import dte.tzevaadomapi.utils.CheckedFunction;
 
 /**
  * Requests Alerts from Pikud Ha'Oref.

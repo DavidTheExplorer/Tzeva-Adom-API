@@ -14,7 +14,7 @@ import dte.tzevaadomapi.alertsource.AlertSource;
 import dte.tzevaadomapi.alertsource.PHOAlertSource;
 import dte.tzevaadomapi.exceptionhandler.LimitedExceptionHandler;
 import dte.tzevaadomapi.listener.TzevaAdomListener;
-import dte.tzevaadomapi.utils.UncheckedExceptions.CheckedSupplier;
+import dte.tzevaadomapi.utils.CheckedSupplier;
 
 /**
  * Notifies registered listeners immediately upon a <b>Tzeva Adom</b>.
