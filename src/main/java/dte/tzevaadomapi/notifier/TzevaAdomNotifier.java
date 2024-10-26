@@ -17,7 +17,7 @@ import dte.tzevaadomapi.listener.TzevaAdomListener;
 import dte.tzevaadomapi.utils.UncheckedExceptions.CheckedSupplier;
 
 /**
- * Notifies registered listeners immediately once a <b>Tzeva Adom</b> takes place.
+ * Notifies registered listeners immediately upon a <b>Tzeva Adom</b>.
  */
 public class TzevaAdomNotifier
 {
@@ -26,6 +26,7 @@ public class TzevaAdomNotifier
 	private final Consumer<Exception> requestFailureHandler;
 	private final Collection<TzevaAdomListener> listeners;
 	private final TzevaAdomHistory history = new TzevaAdomHistory();
+	
 	private Alert mostRecentAlert; //only used in listenAsync(), holding it here solves the effectively final problem
 
 	private TzevaAdomNotifier(Collection<TzevaAdomListener> listeners, AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler)
@@ -37,7 +38,7 @@ public class TzevaAdomNotifier
 	}
 
 	/**
-	 * Starts listening to incoming alerts, and returns the corresponding {@link CompletableFuture} object for further control.
+	 * Starts listening to alerts, and returns the corresponding {@link CompletableFuture} object for further control.
 	 * <p>
 	 * In order to implement a program whose sole workflow is to be idle until there is an alert, call {@link CompletableFuture#join() join()} on the result.
 	 * 
@@ -69,7 +70,7 @@ public class TzevaAdomNotifier
 	}
 	
 	/**
-	 * Adds a listener to notify when it's Tzeva Adom.
+	 * Adds a listener to notify upon a Tzeva Adom.
 	 * 
 	 * @param listener The listener.
 	 */
@@ -81,7 +82,7 @@ public class TzevaAdomNotifier
 	/**
 	 * Returns the captured history since {@link #listenAsync()} was called.
 	 * 
-	 * @return The tzeva adom history.
+	 * @return The Tzeva Adom history.
 	 */
 	public TzevaAdomHistory getHistory()
 	{
@@ -92,7 +93,7 @@ public class TzevaAdomNotifier
 	{
 		Alert alert;
 		
-		//wait until Hamas decides to launch rockets
+		//wait until a terror organization decides to launch rockets
 		do 
 		{
 			alert = requestFromSource(this.alertSource::getMostRecentAlert);
