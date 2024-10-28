@@ -54,7 +54,7 @@ Maven Repository:
 <dependency>
         <groupId>com.github.DavidTheExplorer</groupId>
         <artifactId>Tzeva-Adom-API</artifactId>
-        <version>1.7.1</version>
+        <version>[latest version]</version>
 </dependency>
 ```
 
