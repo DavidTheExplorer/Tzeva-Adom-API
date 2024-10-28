@@ -12,11 +12,12 @@ import java.util.function.Consumer;
 import dte.tzevaadomapi.alert.Alert;
 import dte.tzevaadomapi.alertsource.AlertSource;
 import dte.tzevaadomapi.alertsource.PHOAlertSource;
+import dte.tzevaadomapi.exceptionhandler.LimitedExceptionHandler;
 import dte.tzevaadomapi.listener.TzevaAdomListener;
-import dte.tzevaadomapi.utils.UncheckedExceptions.CheckedSupplier;
+import dte.tzevaadomapi.utils.CheckedFunction;
 
 /**
- * Notifies registered listeners immediately once a <b>Tzeva Adom</b> takes place.
+ * Notifies registered listeners immediately upon a <b>Tzeva Adom</b>.
  */
 public class TzevaAdomNotifier
 {
@@ -25,6 +26,7 @@ public class TzevaAdomNotifier
 	private final Consumer<Exception> requestFailureHandler;
 	private final Collection<TzevaAdomListener> listeners;
 	private final TzevaAdomHistory history = new TzevaAdomHistory();
+	
 	private Alert mostRecentAlert; //only used in listenAsync(), holding it here solves the effectively final problem
 
 	private TzevaAdomNotifier(Collection<TzevaAdomListener> listeners, AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler)
@@ -36,7 +38,7 @@ public class TzevaAdomNotifier
 	}
 
 	/**
-	 * Starts listening to incoming alerts, and returns the corresponding {@link CompletableFuture} object for further control.
+	 * Starts listening to alerts, and returns the corresponding {@link CompletableFuture} object for further control.
 	 * <p>
 	 * In order to implement a program whose sole workflow is to be idle until there is an alert, call {@link CompletableFuture#join() join()} on the result.
 	 * 
@@ -47,13 +49,13 @@ public class TzevaAdomNotifier
 		return CompletableFuture.runAsync(() -> 
 		{
 			//start with the most recent alert
-			this.mostRecentAlert = requestMostRecentAlert();
+			this.mostRecentAlert = requestFromSource(AlertSource::getMostRecentAlert);
 			
 			while(true)	
 			{
-				Deque<Alert> newAlerts = requestFromSource(() -> this.alertSource.getSince(this.mostRecentAlert));
-				
-				//if there are no new alerts - it's not Tzeva Adom
+				Deque<Alert> newAlerts = requestFromSource(source -> source.getSince(this.mostRecentAlert));
+
+				//wait until a terror organization decides to launch rockets
 				if(newAlerts.isEmpty()) 
 					continue;
 				
@@ -68,7 +70,7 @@ public class TzevaAdomNotifier
 	}
 	
 	/**
-	 * Adds a listener to notify when it's Tzeva Adom.
+	 * Adds a listener to notify upon a Tzeva Adom.
 	 * 
 	 * @param listener The listener.
 	 */
@@ -80,28 +82,14 @@ public class TzevaAdomNotifier
 	/**
 	 * Returns the captured history since {@link #listenAsync()} was called.
 	 * 
-	 * @return The tzeva adom history.
+	 * @return The Tzeva Adom history.
 	 */
 	public TzevaAdomHistory getHistory()
 	{
 		return this.history;
 	}
-	
-	private Alert requestMostRecentAlert() 
-	{
-		Alert alert;
-		
-		//wait until Hamas decides to launch rockets
-		do 
-		{
-			alert = requestFromSource(this.alertSource::getMostRecentAlert);
-		}
-		while(alert == AlertSource.NO_RESULT);
-		
-		return alert;
-	}
 
-	private <T> T requestFromSource(CheckedSupplier<T> resultFactory)
+	private <T> T requestFromSource(CheckedFunction<AlertSource, T> request)
 	{
 		while(true)
 		{
@@ -109,8 +97,13 @@ public class TzevaAdomNotifier
 			{
 				//sleep the defined delay
 				TimeUnit.MILLISECONDS.sleep(this.requestDelay.toMillis());
-				
-				return resultFactory.get();
+
+				T result = request.apply(this.alertSource);
+
+				if(result == null)
+					continue;
+
+				return result;
 			}
 			catch(Exception exception) 
 			{
@@ -146,6 +139,14 @@ public class TzevaAdomNotifier
 			return this;
 		}
 
+		/**
+		 * Determines how to handle exceptions when alerts are fetched.
+		 *
+		 * @apiNote To prevent unwanted behaviour such as logging the same IOException when the server is offline, You can pass a {@link LimitedExceptionHandler}.
+		 *
+		 * @param handler The exception handler.
+		 * @return The same instance.
+		 */
 		public Builder onFailedRequest(Consumer<Exception> handler) 
 		{
 			this.requestFailureHandler = handler;
@@ -173,6 +174,10 @@ public class TzevaAdomNotifier
 
 			if(this.listeners.isEmpty())
 				throw new IllegalStateException("At least one listener must be provided to create a TzevaAdomNotifier.");
+
+			//support for LimitedExceptionHandler
+			if(this.requestFailureHandler instanceof TzevaAdomListener)
+				this.listeners.add((TzevaAdomListener) this.requestFailureHandler);
 
 			return new TzevaAdomNotifier(this.listeners, this.alertSource, this.requestDelay, this.requestFailureHandler);
 		}

@@ -26,7 +26,7 @@ public class TzevaAdomHistory implements Iterable<Alert>
 	}
 	
 	/**
-	 * Returns the most recent alert in the history of the underlying notifier.
+	 * Returns the most recent alert in this history.
 	 * 
 	 * @return The most recent alert.
 	 */
@@ -36,10 +36,12 @@ public class TzevaAdomHistory implements Iterable<Alert>
 	}
 	
 	/**
-	 * Returns the list of alerts that happened in a provided {@code region} since the underlying notifier was started.
+	 * Returns the list of alerts that happened in a provided {@code region}.
 	 * 
 	 * @param region The region, may be partial.
 	 * @return The region's history.
+	 *
+	 * @implSpec This method accepts partial regions - So if "תל" is provided, the result would contain alerts from both <i>תל אביב</i> and <i>תל מונד</i>.
 	 */
 	public List<Alert> ofRegion(String region)
 	{
@@ -49,7 +51,7 @@ public class TzevaAdomHistory implements Iterable<Alert>
 	}
 	
 	/**
-	 * Returns a {@link Deque} representation of this history.
+	 * Returns a {@link Deque} snapshot of this history.
 	 * 
 	 * @return The deque.
 	 */
@@ -59,7 +61,7 @@ public class TzevaAdomHistory implements Iterable<Alert>
 	}
 
 	/**
-	 * Returns how many alerts were recorded since the underlying notifier was started.
+	 * Returns how many alerts this history contains.
 	 * 
 	 * @return This history's size.
 	 */

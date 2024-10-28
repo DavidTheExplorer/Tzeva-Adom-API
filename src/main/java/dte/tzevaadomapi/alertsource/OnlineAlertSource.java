@@ -15,7 +15,7 @@ import java.net.URLConnection;
  */
 public abstract class OnlineAlertSource implements AlertSource
 {
-	private final URL requestURL;
+	private URL requestURL;
 	private final Proxy proxy;
 	
 	public OnlineAlertSource(URL requestURL)
@@ -27,6 +27,11 @@ public abstract class OnlineAlertSource implements AlertSource
 	{
 		this.requestURL = requestURL;
 		this.proxy = proxy;
+	}
+
+	public void changeRequestURL(URL requestURL)
+	{
+		this.requestURL = requestURL;
 	}
 	
 	protected URLConnection openConnection() throws IOException 
