@@ -1,5 +1,6 @@
 package dte.tzevaadomapi.alertsource;
 
+import java.io.IOException;
 import java.lang.reflect.Type;
 import java.net.Proxy;
 import java.net.URL;
@@ -79,12 +80,19 @@ public class PHOAlertSource extends OnlineAlertSource
 		});
 	}
 	
-	//starts reading the JSON list posted by Pikud Ha'oref, and applies the function on it
-	private <T> T beginReadingArray(CheckedFunction<JsonReader, T> resultParser) 
+	//starts reading the JSON array posted by Pikud Ha'oref, and applies the function on it
+	private <T> T beginReadingArray(CheckedFunction<JsonReader, T> resultParser)
 	{
 		try(JsonReader reader = new JsonReader(newInputStreamReader()))
 		{
-			reader.beginArray();
+			try
+			{
+				reader.beginArray();
+			}
+			catch(IOException exception)
+			{
+				return null;
+			}
 
 			return resultParser.apply(reader);
 		}

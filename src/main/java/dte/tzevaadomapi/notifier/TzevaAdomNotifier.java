@@ -14,7 +14,7 @@ import dte.tzevaadomapi.alertsource.AlertSource;
 import dte.tzevaadomapi.alertsource.PHOAlertSource;
 import dte.tzevaadomapi.exceptionhandler.LimitedExceptionHandler;
 import dte.tzevaadomapi.listener.TzevaAdomListener;
-import dte.tzevaadomapi.utils.CheckedSupplier;
+import dte.tzevaadomapi.utils.CheckedFunction;
 
 /**
  * Notifies registered listeners immediately upon a <b>Tzeva Adom</b>.
@@ -49,13 +49,13 @@ public class TzevaAdomNotifier
 		return CompletableFuture.runAsync(() -> 
 		{
 			//start with the most recent alert
-			this.mostRecentAlert = requestMostRecentAlert();
+			this.mostRecentAlert = requestFromSource(AlertSource::getMostRecentAlert);
 			
 			while(true)	
 			{
-				Deque<Alert> newAlerts = requestFromSource(() -> this.alertSource.getSince(this.mostRecentAlert));
-				
-				//if there are no new alerts - it's not Tzeva Adom
+				Deque<Alert> newAlerts = requestFromSource(source -> source.getSince(this.mostRecentAlert));
+
+				//wait until a terror organization decides to launch rockets
 				if(newAlerts.isEmpty()) 
 					continue;
 				
@@ -88,22 +88,8 @@ public class TzevaAdomNotifier
 	{
 		return this.history;
 	}
-	
-	private Alert requestMostRecentAlert() 
-	{
-		Alert alert;
-		
-		//wait until a terror organization decides to launch rockets
-		do 
-		{
-			alert = requestFromSource(this.alertSource::getMostRecentAlert);
-		}
-		while(alert == AlertSource.NO_RESULT);
-		
-		return alert;
-	}
 
-	private <T> T requestFromSource(CheckedSupplier<T> resultFactory)
+	private <T> T requestFromSource(CheckedFunction<AlertSource, T> request)
 	{
 		while(true)
 		{
@@ -111,8 +97,13 @@ public class TzevaAdomNotifier
 			{
 				//sleep the defined delay
 				TimeUnit.MILLISECONDS.sleep(this.requestDelay.toMillis());
-				
-				return resultFactory.get();
+
+				T result = request.apply(this.alertSource);
+
+				if(result == null)
+					continue;
+
+				return result;
 			}
 			catch(Exception exception) 
 			{
