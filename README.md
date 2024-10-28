@@ -60,23 +60,15 @@ Maven Repository:
 
 
 ## Adjustments
-Everything in the library is customizable.
-
-- Override the frequency of the Tzeva Adom checks:
-  ```java
-  new TzevaAdomNotifier.Builder()
-  	.requestEvery(Duration.ofSeconds(3))
-  ```
-
-- If you want to lower the frequency of the Tzeva Adom checks:
+- Override the frequency of Tzeva Adom checks:
   ```java
   new TzevaAdomNotifier.Builder()
   	.requestEvery(Duration.ofSeconds(3))
   ```
   
--  If the endpoint of Pikud Ha'oref was changed:
-```java
-   //PHOAlertSource is the default AlertSource implementation, but it's possible to change the URL
+-  Change the endpoint of Pikud Ha'oref if it was changed:
+   ```java
+   //PHOAlertSource is the default AlertSource implementation, you can also implement your own.
    PHOAlertSource alertSource = new PHOAlertSource();
    alertSource.changeRequestURL(new URL("..."));
    
@@ -86,7 +78,7 @@ Everything in the library is customizable.
    
 - Prevent console spam when handling exceptions:
   ```java
+  //LimitedExceptionHandler is a wrapper of Consumer<Exception> that stops handling after X times
   new TzevaAdomNotifier.Builder()
-  	.onFailedRequest(new LimitedExceptionHandler(3, yourExceptionHandler)); //this is a wrapper of Consumer<Exception> that stops handling after X times
-   	.requestFrom(new YourAlertSource())
+  	.onFailedRequest(new LimitedExceptionHandler(3, yourExceptionHandler));
    ```
