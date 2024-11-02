@@ -1,14 +1,14 @@
 # Tzeva Adom API
-Java library that communicates with `Pikud Ha'oref` and notifies registered listeners as soon as a Tzeva Adom happens.\
-Integrating it in projects(games, etc) used by many israelis, **increases** the chances of saving someone's life.
+Java library that communicates with `Pikud Ha'oref` and notifies registered listeners upon a Tzeva Adom.\
+Integrating it in projects used by many israelis, **increases** the chances of saving someone's life.
 
 ## How to use
-How to stop your addicting game on Tzeva Adom:
+How to stop your addicting game upon Tzeva Adom:
 ```java
 Game game = ...;
 
 TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
-        .onFailedRequest(exception -> LOGGER.error("Failed to request the latest alert from Pikud Haoref", exception))
+        .onFailedRequest(exception -> LOGGER.error("Failed to request the latest alert", exception))
         .onTzevaAdom(alert ->
         {
                 game.stop();
@@ -38,7 +38,7 @@ for(Alert alert : notifier.getHistory())
 }
 
 //check a specific region's alerts
-List<Alert> telAvivAlerts = notifier.getHistory().ofRegion("תל אביב");
+List<Alert> alerts = notifier.getHistory().ofRegion("תל אביב");
 ```
 
 ## How to import
