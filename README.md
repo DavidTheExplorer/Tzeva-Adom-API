@@ -82,3 +82,6 @@ Maven Repository:
   new TzevaAdomNotifier.Builder()
   	.onFailedRequest(new LimitedExceptionHandler(3, yourExceptionHandler));
    ```
+
+## Contributions
+All Pull Requests are welcome!
