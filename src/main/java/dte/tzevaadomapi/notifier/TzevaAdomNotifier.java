@@ -59,9 +59,9 @@ public class TzevaAdomNotifier
 				if(newAlerts.isEmpty()) 
 					continue;
 				
-				//update the history variables
+				//update the history
 				this.mostRecentAlert = newAlerts.getFirst();
-				this.history.update(newAlerts);
+				this.history.addAll(newAlerts);
 				
 				//notify Tzeva Adom
 				newAlerts.forEach(this::notifyListeners);

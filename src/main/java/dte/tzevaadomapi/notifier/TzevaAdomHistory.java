@@ -20,7 +20,7 @@ public class TzevaAdomHistory implements Iterable<Alert>
 	 * 
 	 * @param alerts The alerts.
 	 */
-	void update(Collection<Alert> alerts)
+	void addAll(Collection<Alert> alerts)
 	{
 		this.history.addAll(alerts);
 	}
