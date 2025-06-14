@@ -1,14 +1,14 @@
 # Tzeva Adom API
-Java library that communicates with `Pikud Ha'oref` and notifies registered listeners as soon as a Tzeva Adom happens.\
-Integrating it in projects(games, etc) used by many israelis, **increases** the chances of saving someone's life.
+Notifies registered listeners as soon as a Tzeva Adom happens, based on real-time updates from `Pikud Ha'oref`.\
+Integrating this in projects used by many israelis **increases** the chances of **saving a life**.
 
 ## How to use
-How to stop your addicting game on Tzeva Adom:
+Example:
 ```java
-Game game = ...;
+Game game = ...
 
 TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
-        .onFailedRequest(exception -> LOGGER.error("Failed to request the latest alert from Pikud Haoref", exception))
+        .onFailedRequest(exception -> LOGGER.error("Failed to check the latest alert", exception))
         .onTzevaAdom(alert ->
         {
                 game.stop();
@@ -16,16 +16,12 @@ TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
         })
         .build();
 
-//this returns a CompletableFuture - so you can join() if your program needs to stay silent until a Tzeva Adom happens
+//returns a CompletableFuture - so you can join() if your program needs to be idle until a Tzeva Adom
 notifier.listenAsync();
 ```
 \
 By saving the notifier object, you can receive the captured alert history:
 ```java
-import java.util.concurrent.TimeUnit;
-import dte.tzevaadomapi.alert.Alert;
-
-...
 notifier.listenAsync();
 
 //sleep for a day
@@ -38,7 +34,7 @@ for(Alert alert : notifier.getHistory())
 }
 
 //check a specific region's alerts
-List<Alert> telAvivAlerts = notifier.getHistory().ofRegion("תל אביב");
+List<Alert> alerts = notifier.getHistory().ofRegion("תל אביב");
 ```
 
 ## How to import
@@ -66,7 +62,7 @@ Maven Repository:
   	.requestEvery(Duration.ofSeconds(3))
   ```
   
--  Change the endpoint of Pikud Ha'oref if it was changed:
+-  Change the endpoint of Pikud Ha'oref(temp fix in case it has been changed):
    ```java
    //PHOAlertSource is the default AlertSource implementation, you can also implement your own.
    PHOAlertSource alertSource = new PHOAlertSource();
@@ -76,9 +72,12 @@ Maven Repository:
    	.requestFrom(alertSource)
    ```
    
-- Prevent console spam when handling exceptions:
+- Prevent spam when handling request exceptions:
   ```java
   //LimitedExceptionHandler is a wrapper of Consumer<Exception> that stops handling after X times
   new TzevaAdomNotifier.Builder()
   	.onFailedRequest(new LimitedExceptionHandler(3, yourExceptionHandler));
    ```
+
+## Contributions
+All Pull Requests are welcome!
