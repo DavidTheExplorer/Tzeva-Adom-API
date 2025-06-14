@@ -18,19 +18,15 @@ public class Alert
 	@SerializedName("title")
 	private final String title;
 	
-	@SerializedName("category")
-	private final int category;
-	
 	@SerializedName("alertDate")
 	private final LocalDateTime date;
 	
 	public static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH);
 	
-	public Alert(String region, String title, int category, LocalDateTime date) 
+	public Alert(String region, String title, LocalDateTime date)
 	{
 		this.region = region;
 		this.title = title;
-		this.category = category;
 		this.date = date;
 	}
 	
@@ -55,16 +51,6 @@ public class Alert
 	}
 	
 	/**
-	 * Returns the category of this alert.
-	 * 
-	 * @return This alert's category.
-	 */
-	public int getCategory()
-	{
-		return this.category;
-	}
-	
-	/**
 	 * Returns when this alert happened.
 	 * 
 	 * @return This alert's date.
@@ -77,7 +63,7 @@ public class Alert
 	@Override
 	public int hashCode()
 	{
-		return Objects.hash(this.region, this.title, this.category, this.date);
+		return Objects.hash(this.region, this.title, this.date);
 	}
 	
 	@Override
@@ -93,13 +79,12 @@ public class Alert
 		
 		return Objects.equals(this.region, other.region) && 
 				Objects.equals(this.title, other.title) &&
-				Objects.equals(this.category, other.category) &&
 				Objects.equals(this.date, other.date);
 	}
 	
 	@Override
 	public String toString()
 	{
-		return String.format("Alert [region=%s, title=%s, category=%d, date=%s]", this.region, this.title, this.category, this.date.format(DATE_FORMATTER));
+		return String.format("Alert [region=%s, title=%s, date=%s]", this.region, this.title, this.date.format(DATE_FORMATTER));
 	}
 }
