@@ -1,5 +1,3 @@
-package dte.tzevaadomapi.notifier;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -11,6 +9,8 @@ import java.util.LinkedList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
+import dte.tzevaadomapi.notifier.TzevaAdomHistory;
+import dte.tzevaadomapi.notifier.TzevaAdomNotifier;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -100,7 +100,7 @@ public class TzevaAdomNotifierTest
 	/**
 	 * Runs a new notifier based on the mocked Alert Source, and then returns its tzeva adom history.
 	 */
-	private TzevaAdomHistory simulateNotifier() throws InterruptedException 
+	private TzevaAdomHistory simulateNotifier() throws InterruptedException
 	{
 		TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
 				.requestEvery(Duration.ofMillis(5))

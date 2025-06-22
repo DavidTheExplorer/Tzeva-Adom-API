@@ -1,4 +1,4 @@
-package dte.tzevaadomapi.exceptionhandler;
+package dte.tzevaadomapi.extras;
 
 import dte.tzevaadomapi.alert.Alert;
 import dte.tzevaadomapi.listener.TzevaAdomListener;

@@ -12,7 +12,6 @@ import java.util.function.Consumer;
 import dte.tzevaadomapi.alert.Alert;
 import dte.tzevaadomapi.alertsource.AlertSource;
 import dte.tzevaadomapi.alertsource.PHOAlertSource;
-import dte.tzevaadomapi.exceptionhandler.LimitedExceptionHandler;
 import dte.tzevaadomapi.listener.TzevaAdomListener;
 import dte.tzevaadomapi.utils.CheckedFunction;
 
@@ -122,7 +121,7 @@ public class TzevaAdomNotifier
 
 	public static class Builder
 	{
-		private Collection<TzevaAdomListener> listeners = new ArrayList<>();
+		private final Collection<TzevaAdomListener> listeners = new ArrayList<>();
 		private AlertSource alertSource = new PHOAlertSource(); //obviously Pikud Ha'oref is the default source
 		private Duration requestDelay = Duration.ofMillis(500); //half a second is a reasonable delay
 		private Consumer<Exception> requestFailureHandler;
@@ -142,7 +141,7 @@ public class TzevaAdomNotifier
 		/**
 		 * Determines how to handle exceptions when alerts are fetched.
 		 *
-		 * @apiNote To prevent unwanted behaviour such as logging the same IOException when the server is offline, You can pass a {@link LimitedExceptionHandler}.
+		 * @apiNote To prevent unwanted behaviour such as logging the same IOException when the server is offline, You can pass a <i>LimitedExceptionHandler</i>(extras module).
 		 *
 		 * @param handler The exception handler.
 		 * @return The same instance.
