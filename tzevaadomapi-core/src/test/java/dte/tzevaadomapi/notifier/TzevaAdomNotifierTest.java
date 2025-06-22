@@ -1,3 +1,5 @@
+package dte.tzevaadomapi.notifier;
+
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -9,8 +11,6 @@ import java.util.LinkedList;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 
-import dte.tzevaadomapi.notifier.TzevaAdomHistory;
-import dte.tzevaadomapi.notifier.TzevaAdomNotifier;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,7 +33,7 @@ public class TzevaAdomNotifierTest
 	private static final Deque<Alert> NO_UPDATES = new LinkedList<>();
 	
 	@Test
-	public void testNotTzevaAdom() throws Exception 
+	public void testNotTzevaAdom() throws Exception
 	{
 		Alert alert = createAlert("Tel Aviv");
 		
