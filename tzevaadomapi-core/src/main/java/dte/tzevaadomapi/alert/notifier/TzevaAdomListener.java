@@ -1,4 +1,4 @@
-package dte.tzevaadomapi.alert.listener;
+package dte.tzevaadomapi.alert.notifier;
 
 import dte.tzevaadomapi.alert.Alert;
 
