@@ -176,8 +176,8 @@ public class TzevaAdomNotifier
 				throw new IllegalStateException("At least one listener must be provided to create a TzevaAdomNotifier.");
 
 			//support for LimitedExceptionHandler
-			if(this.requestFailureHandler instanceof TzevaAdomListener)
-				this.listeners.add((TzevaAdomListener) this.requestFailureHandler);
+			if(this.requestFailureHandler instanceof TzevaAdomListener tzevaAdomListener)
+				this.listeners.add(tzevaAdomListener);
 
 			return new TzevaAdomNotifier(this.listeners, this.alertSource, this.requestDelay, this.requestFailureHandler);
 		}
