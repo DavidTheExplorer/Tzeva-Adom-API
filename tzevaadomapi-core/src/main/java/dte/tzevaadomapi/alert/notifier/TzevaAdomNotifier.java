@@ -1,4 +1,4 @@
-package dte.tzevaadomapi.notifier;
+package dte.tzevaadomapi.alert.notifier;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -10,9 +10,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import dte.tzevaadomapi.alert.Alert;
-import dte.tzevaadomapi.alertsource.AlertSource;
-import dte.tzevaadomapi.alertsource.PHOAlertSource;
-import dte.tzevaadomapi.listener.TzevaAdomListener;
+import dte.tzevaadomapi.alert.source.AlertSource;
+import dte.tzevaadomapi.alert.source.PHOAlertSource;
+import dte.tzevaadomapi.alert.listener.TzevaAdomListener;
 import dte.tzevaadomapi.utils.CheckedFunction;
 
 /**

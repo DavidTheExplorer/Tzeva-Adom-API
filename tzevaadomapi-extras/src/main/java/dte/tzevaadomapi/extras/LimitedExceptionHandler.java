@@ -1,7 +1,7 @@
 package dte.tzevaadomapi.extras;
 
 import dte.tzevaadomapi.alert.Alert;
-import dte.tzevaadomapi.listener.TzevaAdomListener;
+import dte.tzevaadomapi.alert.listener.TzevaAdomListener;
 
 import java.util.HashMap;
 import java.util.Map;

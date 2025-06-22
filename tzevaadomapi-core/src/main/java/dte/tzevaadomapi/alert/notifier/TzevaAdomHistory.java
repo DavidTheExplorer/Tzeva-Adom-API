@@ -1,4 +1,4 @@
-package dte.tzevaadomapi.notifier;
+package dte.tzevaadomapi.alert.notifier;
 
 import static java.util.stream.Collectors.toList;
 

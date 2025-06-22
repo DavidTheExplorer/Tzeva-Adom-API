@@ -1,4 +1,4 @@
-package dte.tzevaadomapi.alertsource;
+package dte.tzevaadomapi.alert.source;
 
 import java.util.Deque;
 

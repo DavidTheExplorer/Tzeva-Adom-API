@@ -1,4 +1,4 @@
-package dte.tzevaadomapi.alertsource;
+package dte.tzevaadomapi.alert.source;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
