@@ -46,7 +46,7 @@ public class TzevaAdomHistory implements Iterable<Alert>
 	public List<Alert> ofRegion(String region)
 	{
 		return this.history.stream()
-				.filter(alert -> alert.getRegion().contains(region))
+				.filter(alert -> alert.region().contains(region))
 				.collect(toList());
 	}
 	
