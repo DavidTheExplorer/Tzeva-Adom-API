@@ -33,3 +33,4 @@ bin/*
 
 # Maven
 target/
+.flattened-pom.xml
