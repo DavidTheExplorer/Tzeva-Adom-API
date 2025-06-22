@@ -12,7 +12,6 @@ import java.util.function.Consumer;
 import dte.tzevaadomapi.alert.Alert;
 import dte.tzevaadomapi.alert.source.AlertSource;
 import dte.tzevaadomapi.alert.source.PHOAlertSource;
-import dte.tzevaadomapi.alert.listener.TzevaAdomListener;
 import dte.tzevaadomapi.utils.CheckedFunction;
 
 /**
