@@ -52,14 +52,14 @@ public class PHOAlertSource extends OnlineAlertSource
 	}
 	
 	@Override
-	public Alert getMostRecentAlert() throws Exception
+	public Alert getMostRecentAlert()
 	{
 		//read the first alert in the list
 		return beginReadingArray(reader -> GSON.fromJson(reader, Alert.class));
 	}
 	
 	@Override
-	public Deque<Alert> getSince(Alert alert) throws Exception
+	public Deque<Alert> getSince(Alert alert)
 	{
 		return beginReadingArray(reader -> 
 		{
