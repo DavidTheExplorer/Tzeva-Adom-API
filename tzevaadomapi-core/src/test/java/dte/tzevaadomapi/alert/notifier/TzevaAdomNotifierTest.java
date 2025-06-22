@@ -1,4 +1,4 @@
-package dte.tzevaadomapi.notifier;
+package dte.tzevaadomapi.alert.notifier;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -21,7 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import dte.tzevaadomapi.alert.Alert;
-import dte.tzevaadomapi.alertsource.AlertSource;
+import dte.tzevaadomapi.alert.source.AlertSource;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @ExtendWith(MockitoExtension.class)
