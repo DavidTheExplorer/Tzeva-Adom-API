@@ -17,17 +17,17 @@ import dte.tzevaadomapi.utils.CheckedFunction;
 /**
  * Notifies registered listeners immediately upon a <b>Tzeva Adom</b>.
  */
-public class TzevaAdomNotifier
+public class AlertNotifier
 {
 	private final AlertSource alertSource;
 	private final Duration requestDelay;
 	private final Consumer<Exception> requestFailureHandler;
-	private final Collection<TzevaAdomListener> listeners;
-	private final TzevaAdomHistory history = new TzevaAdomHistory();
+	private final Collection<AlertListener> listeners;
+	private final AlertHistory history = new AlertHistory();
 	
 	private Alert mostRecentAlert; //only used in listenAsync(), holding it here solves the effectively final problem
 
-	private TzevaAdomNotifier(Collection<TzevaAdomListener> listeners, AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler)
+	private AlertNotifier(Collection<AlertListener> listeners, AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler)
 	{
 		this.listeners = listeners;
 		this.alertSource = alertSource;
@@ -72,7 +72,7 @@ public class TzevaAdomNotifier
 	 * 
 	 * @param listener The listener.
 	 */
-	public void addListener(TzevaAdomListener listener) 
+	public void addListener(AlertListener listener)
 	{
 		this.listeners.add(listener);
 	}
@@ -80,9 +80,9 @@ public class TzevaAdomNotifier
 	/**
 	 * Returns the captured history since {@link #listenAsync()} was called.
 	 * 
-	 * @return The Tzeva Adom history.
+	 * @return The alert history.
 	 */
-	public TzevaAdomHistory getHistory()
+	public AlertHistory getHistory()
 	{
 		return this.history;
 	}
@@ -120,7 +120,7 @@ public class TzevaAdomNotifier
 
 	public static class Builder
 	{
-		private final Collection<TzevaAdomListener> listeners = new ArrayList<>();
+		private final Collection<AlertListener> listeners = new ArrayList<>();
 		private AlertSource alertSource = new PHOAlertSource(); //obviously Pikud Ha'oref is the default source
 		private Duration requestDelay = Duration.ofMillis(500); //half a second is a reasonable delay
 		private Consumer<Exception> requestFailureHandler;
@@ -151,33 +151,33 @@ public class TzevaAdomNotifier
 			return this;
 		}
 
-		public Builder onTzevaAdom(TzevaAdomListener listener)
+		public Builder onTzevaAdom(AlertListener listener)
 		{
 			this.listeners.add(listener);
 			return this;
 		}
 
-		public TzevaAdomNotifier listenAsync()
+		public AlertNotifier listenAsync()
 		{
-			TzevaAdomNotifier notifier = build();
+			AlertNotifier notifier = build();
 			notifier.listenAsync();
 
 			return notifier;
 		}
 
-		public TzevaAdomNotifier build()
+		public AlertNotifier build()
 		{
 			if(this.requestFailureHandler == null)
-				throw new IllegalStateException("A request failure handler must be provided to create a TzevaAdomNotifier.");
+				throw new IllegalStateException("A request failure handler must be provided to create an AlertNotifier.");
 
 			if(this.listeners.isEmpty())
-				throw new IllegalStateException("At least one listener must be provided to create a TzevaAdomNotifier.");
+				throw new IllegalStateException("At least one listener must be provided to create an AlertNotifier.");
 
 			//support for LimitedExceptionHandler
-			if(this.requestFailureHandler instanceof TzevaAdomListener tzevaAdomListener)
-				this.listeners.add(tzevaAdomListener);
+			if(this.requestFailureHandler instanceof AlertListener alertListener)
+				this.listeners.add(alertListener);
 
-			return new TzevaAdomNotifier(this.listeners, this.alertSource, this.requestDelay, this.requestFailureHandler);
+			return new AlertNotifier(this.listeners, this.alertSource, this.requestDelay, this.requestFailureHandler);
 		}
 	}
 }

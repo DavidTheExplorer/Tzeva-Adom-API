@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import dte.tzevaadomapi.alert.Alert;
 
-public class TzevaAdomHistory implements Iterable<Alert>
+public class AlertHistory implements Iterable<Alert>
 {
 	private final Deque<Alert> history = new LinkedList<>();
 	
