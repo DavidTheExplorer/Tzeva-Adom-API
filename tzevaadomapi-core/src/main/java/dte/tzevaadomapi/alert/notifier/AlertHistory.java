@@ -20,7 +20,7 @@ public class AlertHistory implements Iterable<Alert>
 	 * 
 	 * @param alerts The alerts.
 	 */
-	void update(Collection<Alert> alerts)
+	void addAll(Collection<Alert> alerts)
 	{
 		this.history.addAll(alerts);
 	}
@@ -40,7 +40,6 @@ public class AlertHistory implements Iterable<Alert>
 	 * 
 	 * @param region The region, may be partial.
 	 * @return The region's history.
-	 *
 	 * @implSpec This method accepts partial regions - So if "תל" is provided, the result would contain alerts from both <i>תל אביב</i> and <i>תל מונד</i>.
 	 */
 	public List<Alert> ofRegion(String region)
