@@ -17,13 +17,13 @@ public abstract class OnlineAlertProvider implements AlertProvider
 {
 	private URL requestURL;
 	private final Proxy proxy;
-	
-	public OnlineAlertProvider(URL requestURL)
+
+	protected OnlineAlertProvider(URL requestURL)
 	{
 		this(requestURL, Proxy.NO_PROXY);
 	}
-	
-	public OnlineAlertProvider(URL requestURL, Proxy proxy)
+
+	protected OnlineAlertProvider(URL requestURL, Proxy proxy)
 	{
 		this.requestURL = requestURL;
 		this.proxy = proxy;
