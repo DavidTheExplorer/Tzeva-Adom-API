@@ -29,10 +29,13 @@ public class LimitedExceptionHandler implements Consumer<Exception>, AlertListen
     @Override
     public void accept(Exception exception)
     {
-        this.timesHandled.merge(exception.getClass(), 1, Integer::sum);
+        int timesHandled = this.timesHandled.getOrDefault(exception.getClass(), 0);
 
-        if(this.timesHandled.get(exception.getClass()) <= this.limit)
-            this.delegate.accept(exception);
+        if(timesHandled >= this.limit)
+            return;
+
+        this.timesHandled.put(exception.getClass(), ++timesHandled);
+        this.delegate.accept(exception);
     }
 
     @Override
