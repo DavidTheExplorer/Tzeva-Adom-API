@@ -10,8 +10,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import dte.tzevaadomapi.alert.Alert;
-import dte.tzevaadomapi.alert.source.AlertSource;
-import dte.tzevaadomapi.alert.source.PHOAlertSource;
+import dte.tzevaadomapi.alert.provider.AlertProvider;
+import dte.tzevaadomapi.alert.provider.PHOAlertProvider;
 import dte.tzevaadomapi.utils.CheckedFunction;
 
 /**
@@ -19,7 +19,7 @@ import dte.tzevaadomapi.utils.CheckedFunction;
  */
 public class AlertNotifier
 {
-	private final AlertSource alertSource;
+	private final AlertProvider alertProvider;
 	private final Duration requestDelay;
 	private final Consumer<Exception> requestFailureHandler;
 	private final Collection<AlertListener> listeners;
@@ -27,10 +27,10 @@ public class AlertNotifier
 	
 	private Alert mostRecentAlert; //only used in listenAsync(), holding it here solves the effectively final problem
 
-	private AlertNotifier(Collection<AlertListener> listeners, AlertSource alertSource, Duration requestDelay, Consumer<Exception> requestFailureHandler)
+	private AlertNotifier(Collection<AlertListener> listeners, AlertProvider alertProvider, Duration requestDelay, Consumer<Exception> requestFailureHandler)
 	{
 		this.listeners = listeners;
-		this.alertSource = alertSource;
+		this.alertProvider = alertProvider;
 		this.requestDelay = requestDelay;
 		this.requestFailureHandler = requestFailureHandler;
 	}
@@ -47,11 +47,11 @@ public class AlertNotifier
 		return CompletableFuture.runAsync(() -> 
 		{
 			//start with the most recent alert
-			this.mostRecentAlert = requestFromSource(AlertSource::getMostRecentAlert);
+			this.mostRecentAlert = queryProvider(AlertProvider::getMostRecentAlert);
 			
 			while(true)	
 			{
-				Deque<Alert> newAlerts = requestFromSource(source -> source.getSince(this.mostRecentAlert));
+				Deque<Alert> newAlerts = queryProvider(provider -> provider.getSince(this.mostRecentAlert));
 
 				//wait until a terror organization decides to launch rockets
 				if(newAlerts.isEmpty()) 
@@ -87,7 +87,7 @@ public class AlertNotifier
 		return this.history;
 	}
 
-	private <T> T requestFromSource(CheckedFunction<AlertSource, T> request)
+	private <T> T queryProvider(CheckedFunction<AlertProvider, T> request)
 	{
 		while(true)
 		{
@@ -96,7 +96,7 @@ public class AlertNotifier
 				//sleep the defined delay
 				TimeUnit.MILLISECONDS.sleep(this.requestDelay.toMillis());
 
-				T result = request.apply(this.alertSource);
+				T result = request.apply(this.alertProvider);
 
 				if(result == null)
 					continue;
@@ -121,13 +121,13 @@ public class AlertNotifier
 	public static class Builder
 	{
 		private final Collection<AlertListener> listeners = new ArrayList<>();
-		private AlertSource alertSource = new PHOAlertSource(); //obviously Pikud Ha'oref is the default source
+		private AlertProvider alertProvider = new PHOAlertProvider(); //Pikud Ha'oref is the default provider
 		private Duration requestDelay = Duration.ofMillis(500); //half a second is a reasonable delay
 		private Consumer<Exception> requestFailureHandler;
 
-		public Builder requestFrom(AlertSource alertSource) 
+		public Builder requestFrom(AlertProvider alertProvider)
 		{
-			this.alertSource = alertSource;
+			this.alertProvider = alertProvider;
 			return this;
 		}
 
@@ -177,7 +177,7 @@ public class AlertNotifier
 			if(this.requestFailureHandler instanceof AlertListener alertListener)
 				this.listeners.add(alertListener);
 
-			return new AlertNotifier(this.listeners, this.alertSource, this.requestDelay, this.requestFailureHandler);
+			return new AlertNotifier(this.listeners, this.alertProvider, this.requestDelay, this.requestFailureHandler);
 		}
 	}
 }

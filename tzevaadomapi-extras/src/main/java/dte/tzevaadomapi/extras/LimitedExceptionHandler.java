@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 /**
  * An implementation of {@link Consumer<Exception>} that handles a predetermined amount of exceptions, and then stops until the next Tzeva Adom;
- * This prevents unwanted behaviour such as logging the same exception endlessly(e.g. when the <i>AlertSource</i>'s server is offline).
+ * This prevents unwanted behaviour such as logging the same exception endlessly(e.g. when the <i>AlertProvider</i>'s server is offline).
  *
  * @implSpec To prevent swallowing 2 different exceptions, the limit is applied per <i>Exception Class</i> -
  * So for a limit of 5, only 5 <i>NullPointerException</i>s and 5 <i>IOException</i>s would be handled.

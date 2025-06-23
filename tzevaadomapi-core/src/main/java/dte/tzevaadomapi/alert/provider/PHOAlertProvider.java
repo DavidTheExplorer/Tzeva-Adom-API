@@ -1,4 +1,4 @@
-package dte.tzevaadomapi.alert.source;
+package dte.tzevaadomapi.alert.provider;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -23,7 +23,7 @@ import dte.tzevaadomapi.utils.CheckedFunction;
 /**
  * Requests Alerts from Pikud Ha'Oref.
  */
-public class PHOAlertSource extends OnlineAlertSource
+public class PHOAlertProvider extends OnlineAlertProvider
 {
 	private static final URL REQUEST_URL = URLFactory.of("https://www.oref.org.il/warningMessages/alert/History/AlertsHistory.json");
 	
@@ -32,21 +32,21 @@ public class PHOAlertSource extends OnlineAlertSource
 			.create();
 	
 	/**
-	 * Creates a source based on Pikud Ha'oref, without any proxy involved.
+	 * Creates a provider based on Pikud Ha'oref, without any proxy involved.
 	 */
-	public PHOAlertSource() 
+	public PHOAlertProvider()
 	{
 		super(REQUEST_URL);
 	}
 	
 	/**
-	 * Creates a source based on Pikud Ha'oref that uses the provided {@code proxy} to connect. 
+	 * Creates a provider based on Pikud Ha'oref that uses the provided {@code proxy} to connect.
 	 * <p>
 	 * * Use this constructor when the library is used <i>outside</i> of Israel.
 	 * 
 	 * @param proxy The proxy to use when connecting.
 	 */
-	public PHOAlertSource(Proxy proxy) 
+	public PHOAlertProvider(Proxy proxy)
 	{
 		super(REQUEST_URL, proxy);
 	}

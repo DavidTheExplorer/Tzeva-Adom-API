@@ -1,4 +1,4 @@
-package dte.tzevaadomapi.alert.source;
+package dte.tzevaadomapi.alert.provider;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 
@@ -9,21 +9,21 @@ import java.net.URL;
 import java.net.URLConnection;
 
 /**
- * Represents a source that requires internet connection in order to access.
+ * Represents a provider that requires internet connection in order to access.
  * <p>
  * This class takes care of the essential connection details(the url, a possible proxy) and provides convenient connection methods.
  */
-public abstract class OnlineAlertSource implements AlertSource
+public abstract class OnlineAlertProvider implements AlertProvider
 {
 	private URL requestURL;
 	private final Proxy proxy;
 	
-	public OnlineAlertSource(URL requestURL)
+	public OnlineAlertProvider(URL requestURL)
 	{
 		this(requestURL, Proxy.NO_PROXY);
 	}
 	
-	public OnlineAlertSource(URL requestURL, Proxy proxy) 
+	public OnlineAlertProvider(URL requestURL, Proxy proxy)
 	{
 		this.requestURL = requestURL;
 		this.proxy = proxy;

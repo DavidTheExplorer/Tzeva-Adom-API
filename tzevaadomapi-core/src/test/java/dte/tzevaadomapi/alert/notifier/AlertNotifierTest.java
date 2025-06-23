@@ -21,14 +21,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import dte.tzevaadomapi.alert.Alert;
-import dte.tzevaadomapi.alert.source.AlertSource;
+import dte.tzevaadomapi.alert.provider.AlertProvider;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @ExtendWith(MockitoExtension.class)
 public class AlertNotifierTest
 {
 	@Mock
-	private AlertSource alertSource;
+	private AlertProvider alertProvider;
 	
 	private static final Deque<Alert> NO_UPDATES = new LinkedList<>();
 	
@@ -37,8 +37,8 @@ public class AlertNotifierTest
 	{
 		Alert alert = createAlert("Tel Aviv");
 		
-		when(this.alertSource.getMostRecentAlert()).thenReturn(alert);
-		when(this.alertSource.getSince(alert)).thenReturn(NO_UPDATES);
+		when(this.alertProvider.getMostRecentAlert()).thenReturn(alert);
+		when(this.alertProvider.getSince(alert)).thenReturn(NO_UPDATES);
 
 		assertEquals(0, simulateNotifier().size());
 	}
@@ -50,8 +50,8 @@ public class AlertNotifierTest
 		Alert first = createAlert("Tel Aviv");
 		Alert second = createAlert("Haifa");
 		
-		when(this.alertSource.getMostRecentAlert()).thenReturn(first);
-		when(this.alertSource.getSince(first)).thenReturn(NO_UPDATES, NO_UPDATES, dequeOf(second), NO_UPDATES);
+		when(this.alertProvider.getMostRecentAlert()).thenReturn(first);
+		when(this.alertProvider.getSince(first)).thenReturn(NO_UPDATES, NO_UPDATES, dequeOf(second), NO_UPDATES);
 		
 		assertEquals(1, simulateNotifier().size());
 	}
@@ -64,8 +64,8 @@ public class AlertNotifierTest
 		Alert second = createAlert("Haifa");
 		Alert third = createAlert("Jerusalem");
 		
-		when(this.alertSource.getMostRecentAlert()).thenReturn(first);
-		when(this.alertSource.getSince(any())).thenReturn(dequeOf(second), dequeOf(third), dequeOf(first), NO_UPDATES);
+		when(this.alertProvider.getMostRecentAlert()).thenReturn(first);
+		when(this.alertProvider.getSince(any())).thenReturn(dequeOf(second), dequeOf(third), dequeOf(first), NO_UPDATES);
 		
 		assertEquals(3, simulateNotifier().size());
 	}
@@ -77,9 +77,9 @@ public class AlertNotifierTest
 	{
 		Alert first = createAlert("Tel Aviv");
 		
-		when(this.alertSource.getMostRecentAlert()).thenReturn(first);
+		when(this.alertProvider.getMostRecentAlert()).thenReturn(first);
 		
-		when(this.alertSource.getSince(any())).thenReturn(
+		when(this.alertProvider.getSince(any())).thenReturn(
 				NO_UPDATES, 
 				NO_UPDATES, 
 				NO_UPDATES,
@@ -98,13 +98,13 @@ public class AlertNotifierTest
 	}
 	
 	/**
-	 * Runs a new notifier based on the mocked Alert Source, and then returns its tzeva adom history.
+	 * Runs a new notifier based on the mocked alert provider, and then returns its tzeva adom history.
 	 */
 	private AlertHistory simulateNotifier() throws InterruptedException
 	{
 		AlertNotifier notifier = new AlertNotifier.Builder()
 				.requestEvery(Duration.ofMillis(5))
-				.requestFrom(this.alertSource)
+				.requestFrom(this.alertProvider)
 				.onFailedRequest(Assertions::fail)
 				.onTzevaAdom(alert -> {})
 				.listenAsync();
