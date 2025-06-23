@@ -1,4 +1,4 @@
-package dte.tzevaadomapi.alert.source;
+package dte.tzevaadomapi.alert.provider;
 
 import java.util.Deque;
 
@@ -7,7 +7,7 @@ import dte.tzevaadomapi.alert.Alert;
 /**
  * Provides information about Tzeva Adoms in Israel, in form of {@link Alert} objects.
  */
-public interface AlertSource
+public interface AlertProvider
 {
 	/**
 	 * Returns the most recent {@link Alert} that happened in Israel
