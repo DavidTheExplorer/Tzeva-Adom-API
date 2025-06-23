@@ -8,11 +8,11 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import dte.tzevaadomapi.alert.Alert;
 import dte.tzevaadomapi.alert.provider.AlertProvider;
 import dte.tzevaadomapi.alert.provider.PHOAlertProvider;
-import dte.tzevaadomapi.utils.CheckedFunction;
 
 /**
  * Notifies registered listeners immediately upon a <b>Tzeva Adom</b>.
@@ -59,7 +59,7 @@ public class AlertNotifier
 				
 				//update the history variables
 				this.mostRecentAlert = newAlerts.getFirst();
-				this.history.update(newAlerts);
+				this.history.addAll(newAlerts);
 				
 				//notify Tzeva Adom
 				newAlerts.forEach(this::notifyListeners);
@@ -87,7 +87,7 @@ public class AlertNotifier
 		return this.history;
 	}
 
-	private <T> T queryProvider(CheckedFunction<AlertProvider, T> request)
+	private <T> T queryProvider(Function<AlertProvider, T> request)
 	{
 		while(true)
 		{
@@ -140,14 +140,18 @@ public class AlertNotifier
 		/**
 		 * Determines how to handle exceptions when alerts are fetched.
 		 *
-		 * @apiNote To prevent unwanted behaviour such as logging the same IOException when the server is offline, You can pass a <i>LimitedExceptionHandler</i>(extras module).
-		 *
 		 * @param handler The exception handler.
 		 * @return The same instance.
+		 * @apiNote To prevent unwanted behaviour such as spam-logging the same IOException when the server is offline, You can pass a <i>LimitedExceptionHandler</i>(extras module).
 		 */
 		public Builder onFailedRequest(Consumer<Exception> handler) 
 		{
 			this.requestFailureHandler = handler;
+
+			//support for LimitedExceptionHandler
+			if(handler instanceof AlertListener alertListener)
+				this.listeners.add(alertListener);
+
 			return this;
 		}
 
@@ -172,10 +176,6 @@ public class AlertNotifier
 
 			if(this.listeners.isEmpty())
 				throw new IllegalStateException("At least one listener must be provided to create an AlertNotifier.");
-
-			//support for LimitedExceptionHandler
-			if(this.requestFailureHandler instanceof AlertListener alertListener)
-				this.listeners.add(alertListener);
 
 			return new AlertNotifier(this.listeners, this.alertProvider, this.requestDelay, this.requestFailureHandler);
 		}
