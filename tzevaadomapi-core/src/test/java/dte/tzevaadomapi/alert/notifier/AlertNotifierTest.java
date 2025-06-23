@@ -25,7 +25,7 @@ import dte.tzevaadomapi.alert.source.AlertSource;
 
 @TestInstance(Lifecycle.PER_CLASS)
 @ExtendWith(MockitoExtension.class)
-public class TzevaAdomNotifierTest
+public class AlertNotifierTest
 {
 	@Mock
 	private AlertSource alertSource;
@@ -100,9 +100,9 @@ public class TzevaAdomNotifierTest
 	/**
 	 * Runs a new notifier based on the mocked Alert Source, and then returns its tzeva adom history.
 	 */
-	private TzevaAdomHistory simulateNotifier() throws InterruptedException
+	private AlertHistory simulateNotifier() throws InterruptedException
 	{
-		TzevaAdomNotifier notifier = new TzevaAdomNotifier.Builder()
+		AlertNotifier notifier = new AlertNotifier.Builder()
 				.requestEvery(Duration.ofMillis(5))
 				.requestFrom(this.alertSource)
 				.onFailedRequest(Assertions::fail)

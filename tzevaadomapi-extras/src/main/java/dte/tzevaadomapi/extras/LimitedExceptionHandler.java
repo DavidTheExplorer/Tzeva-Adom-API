@@ -1,7 +1,7 @@
 package dte.tzevaadomapi.extras;
 
 import dte.tzevaadomapi.alert.Alert;
-import dte.tzevaadomapi.alert.notifier.TzevaAdomListener;
+import dte.tzevaadomapi.alert.notifier.AlertListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +14,7 @@ import java.util.function.Consumer;
  * @implSpec To prevent swallowing 2 different exceptions, the limit is applied per <i>Exception Class</i> -
  * So for a limit of 5, only 5 <i>NullPointerException</i>s and 5 <i>IOException</i>s would be handled.
  */
-public class LimitedExceptionHandler implements Consumer<Exception>, TzevaAdomListener
+public class LimitedExceptionHandler implements Consumer<Exception>, AlertListener
 {
     private final Consumer<Exception> delegate;
     private final int limit;
