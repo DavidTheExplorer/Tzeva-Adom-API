@@ -58,7 +58,7 @@ public class AlertNotifier
 					continue;
 				
 				//update the history variables
-				this.mostRecentAlert = newAlerts.getFirst();
+				this.mostRecentAlert = newAlerts.getLast();
 				this.history.addAll(newAlerts);
 				
 				//notify Tzeva Adom

@@ -5,6 +5,7 @@ import java.lang.reflect.Type;
 import java.net.Proxy;
 import java.net.URL;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.LinkedList;
 
@@ -63,7 +64,7 @@ public class PHOAlertProvider extends OnlineAlertProvider
 	{
 		return beginReadingArray(reader -> 
 		{
-			Deque<Alert> result = new LinkedList<>();
+			LinkedList<Alert> result = new LinkedList<>();
 
 			while(reader.hasNext()) 
 			{
@@ -75,6 +76,9 @@ public class PHOAlertProvider extends OnlineAlertProvider
 
 				result.add(nextAlert);
 			}
+
+			//preserve the correct order
+			Collections.reverse(result);
 
 			return result;
 		});
