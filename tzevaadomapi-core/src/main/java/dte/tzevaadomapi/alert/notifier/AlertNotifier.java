@@ -14,9 +14,7 @@ import dte.tzevaadomapi.alert.Alert;
 import dte.tzevaadomapi.alert.provider.AlertProvider;
 import dte.tzevaadomapi.alert.provider.PHOAlertProvider;
 
-/**
- * Notifies registered listeners immediately upon a <b>Tzeva Adom</b>.
- */
+/** Notifies registered listeners immediately upon a Tzeva Adom alert. */
 public class AlertNotifier
 {
 	private final AlertProvider alertProvider;

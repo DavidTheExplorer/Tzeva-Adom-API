@@ -21,9 +21,7 @@ import dte.tzevaadomapi.alert.Alert;
 import dte.tzevaadomapi.utils.URLFactory;
 import dte.tzevaadomapi.utils.CheckedFunction;
 
-/**
- * Requests Alerts from Pikud Ha'Oref.
- */
+/** Requests Alerts from Pikud Ha'Oref. */
 public class PHOAlertProvider extends OnlineAlertProvider
 {
 	private static final URL REQUEST_URL = URLFactory.of("https://www.oref.org.il/warningMessages/alert/History/AlertsHistory.json");

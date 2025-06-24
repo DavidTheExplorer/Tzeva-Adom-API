@@ -11,15 +11,11 @@ import java.util.Optional;
 
 import dte.tzevaadomapi.alert.Alert;
 
+/** Keeps track of the Tzeva Adom alerts that an {@link AlertNotifier} has captured. */
 public class AlertHistory implements Iterable<Alert>
 {
 	private final Deque<Alert> history = new LinkedList<>();
-	
-	/**
-	 * Records a collection of alerts.
-	 * 
-	 * @param alerts The alerts.
-	 */
+
 	void addAll(Collection<Alert> alerts)
 	{
 		this.history.addAll(alerts);
@@ -36,11 +32,11 @@ public class AlertHistory implements Iterable<Alert>
 	}
 	
 	/**
-	 * Returns the list of alerts that happened in a provided {@code region}.
-	 * 
+	 * Returns a list of the alerts that happened in the provided {@code region}.
+	 *
 	 * @param region The region, may be partial.
 	 * @return The region's history.
-	 * @implSpec This method accepts partial regions - So if "תל" is provided, the result would contain alerts from both <i>תל אביב</i> and <i>תל מונד</i>.
+	 * @implNote This method accepts partial regions - If "תל" is provided, the result could contain alerts from both <i>תל אביב</i> and <i>תל מונד</i>.
 	 */
 	public List<Alert> ofRegion(String region)
 	{

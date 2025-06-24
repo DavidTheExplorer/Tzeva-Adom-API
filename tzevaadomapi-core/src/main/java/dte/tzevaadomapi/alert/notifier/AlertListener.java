@@ -2,9 +2,7 @@ package dte.tzevaadomapi.alert.notifier;
 
 import dte.tzevaadomapi.alert.Alert;
 
-/**
- * Represents an action that should be executed <b>immediately</b> upon a Tzeva Adom.
- */
+/** An action that is executed immediately upon a Tzeva Adom alert. */
 @FunctionalInterface
 public interface AlertListener
 {
