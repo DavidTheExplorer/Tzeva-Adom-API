@@ -9,8 +9,8 @@ import com.google.gson.annotations.SerializedName;
 /**
  * Represents a Tzeva Adom alert and provides information about it.
  *
- * @param region Where this alert happened.
- * @param description What happened that had caused this alert.
+ * @param region The approximate region where this alert happened.
+ * @param description The description of the event that caused this alert.
  * @param date When this alert happened.
  */
 public record Alert(@SerializedName("data") String region,
