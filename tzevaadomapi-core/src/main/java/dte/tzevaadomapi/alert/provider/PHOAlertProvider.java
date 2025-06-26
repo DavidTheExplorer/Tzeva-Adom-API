@@ -51,7 +51,7 @@ public class PHOAlertProvider extends OnlineAlertProvider
 	}
 	
 	@Override
-	public Alert getMostRecentAlert()
+	public Alert getMostRecent()
 	{
 		//read the first alert in the list
 		return beginReadingArray(reader -> GSON.fromJson(reader, Alert.class));
