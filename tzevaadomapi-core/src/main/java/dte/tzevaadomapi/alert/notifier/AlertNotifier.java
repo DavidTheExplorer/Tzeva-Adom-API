@@ -45,7 +45,7 @@ public class AlertNotifier
 		return CompletableFuture.runAsync(() -> 
 		{
 			//start with the most recent alert
-			this.mostRecentAlert = queryProvider(AlertProvider::getMostRecentAlert);
+			this.mostRecentAlert = queryProvider(AlertProvider::getMostRecent);
 			
 			while(true)	
 			{

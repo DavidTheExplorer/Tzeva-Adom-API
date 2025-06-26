@@ -12,7 +12,7 @@ public interface AlertProvider
 	 * 
 	 * @return The alert, or null if no info was found.
 	 */
-	Alert getMostRecentAlert();
+	Alert getMostRecent();
 	
 	/**
 	 * Returns all the alerts that happened since the provided {@code alert}.

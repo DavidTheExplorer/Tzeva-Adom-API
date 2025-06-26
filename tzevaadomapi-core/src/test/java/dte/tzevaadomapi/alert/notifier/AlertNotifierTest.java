@@ -37,7 +37,7 @@ public class AlertNotifierTest
 	{
 		Alert alert = createAlert("Tel Aviv");
 		
-		when(this.alertProvider.getMostRecentAlert()).thenReturn(alert);
+		when(this.alertProvider.getMostRecent()).thenReturn(alert);
 		when(this.alertProvider.getSince(alert)).thenReturn(NO_UPDATES);
 
 		assertEquals(0, simulateNotifier().size());
@@ -50,7 +50,7 @@ public class AlertNotifierTest
 		Alert first = createAlert("Tel Aviv");
 		Alert second = createAlert("Haifa");
 		
-		when(this.alertProvider.getMostRecentAlert()).thenReturn(first);
+		when(this.alertProvider.getMostRecent()).thenReturn(first);
 		when(this.alertProvider.getSince(first)).thenReturn(NO_UPDATES, NO_UPDATES, dequeOf(second), NO_UPDATES);
 		
 		assertEquals(1, simulateNotifier().size());
@@ -64,7 +64,7 @@ public class AlertNotifierTest
 		Alert second = createAlert("Haifa");
 		Alert third = createAlert("Jerusalem");
 		
-		when(this.alertProvider.getMostRecentAlert()).thenReturn(first);
+		when(this.alertProvider.getMostRecent()).thenReturn(first);
 		when(this.alertProvider.getSince(any())).thenReturn(dequeOf(second), dequeOf(third), dequeOf(first), NO_UPDATES);
 		
 		assertEquals(3, simulateNotifier().size());
@@ -77,7 +77,7 @@ public class AlertNotifierTest
 	{
 		Alert first = createAlert("Tel Aviv");
 		
-		when(this.alertProvider.getMostRecentAlert()).thenReturn(first);
+		when(this.alertProvider.getMostRecent()).thenReturn(first);
 		
 		when(this.alertProvider.getSince(any())).thenReturn(
 				NO_UPDATES, 
